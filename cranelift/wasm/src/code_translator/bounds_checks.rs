@@ -144,10 +144,10 @@ where
             let bound = get_dynamic_heap_bound(builder, env, heap);
             let oob = make_compare(
                 builder,
-                IntCC::UnsignedGreaterThanOrEqual,
-                index,
-                Some(0),
+                IntCC::UnsignedLessThanOrEqual,
                 bound,
+                Some(0),
+                index,
                 Some(0),
             );
             Reachable(explicit_check_oob_condition_and_compute_addr(
@@ -192,10 +192,10 @@ where
             let bound = get_dynamic_heap_bound(builder, env, heap);
             let oob = make_compare(
                 builder,
-                IntCC::UnsignedGreaterThan,
-                index,
-                Some(0),
+                IntCC::UnsignedLessThan,
                 bound,
+                Some(0),
+                index,
                 Some(0),
             );
             Reachable(explicit_check_oob_condition_and_compute_addr(
@@ -236,11 +236,11 @@ where
             }
             let oob = make_compare(
                 builder,
-                IntCC::UnsignedGreaterThan,
-                index,
-                Some(0),
+                IntCC::UnsignedLessThan,
                 adjusted_bound,
                 Some(adjustment),
+                index,
+                Some(0),
             );
             Reachable(explicit_check_oob_condition_and_compute_addr(
                 &mut builder.cursor(),
@@ -285,11 +285,11 @@ where
             let bound = get_dynamic_heap_bound(builder, env, heap);
             let oob = make_compare(
                 builder,
-                IntCC::UnsignedGreaterThan,
-                adjusted_index,
-                i64::try_from(offset_and_size).ok(),
+                IntCC::UnsignedLessThan,
                 bound,
                 Some(0),
+                adjusted_index,
+                i64::try_from(offset_and_size).ok(),
             );
             Reachable(explicit_check_oob_condition_and_compute_addr(
                 &mut builder.cursor(),
@@ -398,10 +398,10 @@ where
             }
             let oob = make_compare(
                 builder,
-                IntCC::UnsignedGreaterThan,
-                index,
-                Some(0),
+                IntCC::UnsignedLessThan,
                 adjusted_bound_value,
+                Some(0),
+                index,
                 Some(0),
             );
             Reachable(explicit_check_oob_condition_and_compute_addr(

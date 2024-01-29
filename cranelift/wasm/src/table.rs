@@ -56,10 +56,8 @@ impl TableData {
         // Start with the bounds check. Trap if `index + 1 > bound`.
         let bound = self.bound.bound(pos.cursor(), index_ty);
 
-        // `index > bound - 1` is the same as `index >= bound`.
-        let oob = pos
-            .ins()
-            .icmp(IntCC::UnsignedGreaterThanOrEqual, index, bound);
+        // `index > bound - 1` is the same as `bound <= index`.
+        let oob = pos.ins().icmp(IntCC::UnsignedLessThanOrEqual, bound, index);
 
         if !enable_table_access_spectre_mitigation {
             pos.ins().trapnz(oob, ir::TrapCode::TableOutOfBounds);
