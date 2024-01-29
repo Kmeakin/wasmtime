@@ -2560,13 +2560,13 @@
   (if-let $true (has_zbb))
   (rv_min x y))
 
-(rule 1 (gen_select_xreg (int_compare_decompose cc x y) x y)
-  (if-let (IntCC.UnsignedGreaterThan) (intcc_without_eq cc))
+(rule 2 (gen_select_xreg (int_compare_decompose cc x y) y x)
+  (if-let (IntCC.UnsignedLessThan) (intcc_without_eq cc))
   (if-let $true (has_zbb))
   (rv_maxu x y))
 
-(rule 1 (gen_select_xreg (int_compare_decompose cc x y) x y)
-  (if-let (IntCC.SignedGreaterThan) (intcc_without_eq cc))
+(rule 2 (gen_select_xreg (int_compare_decompose cc x y) y x)
+  (if-let (IntCC.SignedLessThan) (intcc_without_eq cc))
   (if-let $true (has_zbb))
   (rv_max x y))
 
@@ -2688,19 +2688,19 @@
 (rule (cmp_ltz rs) (int_compare (IntCC.SignedLessThan) rs (zero_reg)))
 
 (decl cmp_gt (XReg XReg) IntegerCompare)
-(rule (cmp_gt rs1 rs2) (int_compare (IntCC.SignedGreaterThan) rs1 rs2))
+(rule (cmp_gt rs1 rs2) (int_compare (IntCC.SignedLessThan) rs2 rs1))
 
 (decl cmp_ge (XReg XReg) IntegerCompare)
-(rule (cmp_ge rs1 rs2) (int_compare (IntCC.SignedGreaterThanOrEqual) rs1 rs2))
+(rule (cmp_ge rs1 rs2) (int_compare (IntCC.SignedLessThanOrEqual) rs2 rs1))
 
 (decl cmp_le (XReg XReg) IntegerCompare)
 (rule (cmp_le rs1 rs2) (int_compare (IntCC.SignedLessThanOrEqual) rs1 rs2))
 
 (decl cmp_gtu (XReg XReg) IntegerCompare)
-(rule (cmp_gtu rs1 rs2) (int_compare (IntCC.UnsignedGreaterThan) rs1 rs2))
+(rule (cmp_gtu rs1 rs2) (int_compare (IntCC.UnsignedLessThan) rs2 rs1))
 
 (decl cmp_geu (XReg XReg) IntegerCompare)
-(rule (cmp_geu rs1 rs2) (int_compare (IntCC.UnsignedGreaterThanOrEqual) rs1 rs2))
+(rule (cmp_geu rs1 rs2) (int_compare (IntCC.UnsignedLessThanOrEqual) rs2 rs1))
 
 (decl cmp_ltu (XReg XReg) IntegerCompare)
 (rule (cmp_ltu rs1 rs2) (int_compare (IntCC.UnsignedLessThan) rs1 rs2))

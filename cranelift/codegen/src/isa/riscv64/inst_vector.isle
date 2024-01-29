@@ -1666,62 +1666,6 @@
   (if-let y_imm (replicated_imm5 y))
   (rv_vmsle_vi x y_imm (unmasked) ty))
 
-;; IntCC.UnsignedGreaterThan
-
-(rule 0 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.UnsignedGreaterThan) x y)
-  (rv_vmsgtu_vv x y (unmasked) ty))
-
-(rule 1 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.UnsignedGreaterThan) x (splat y))
-  (rv_vmsgtu_vx x y (unmasked) ty))
-
-(rule 2 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.UnsignedGreaterThan) (splat x) y)
-  (rv_vmsltu_vx y x (unmasked) ty))
-
-(rule 3 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.UnsignedGreaterThan) x y)
-  (if-let y_imm (replicated_imm5 y))
-  (rv_vmsgtu_vi x y_imm (unmasked) ty))
-
-;; IntCC.SignedGreaterThan
-
-(rule 0 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.SignedGreaterThan) x y)
-  (rv_vmsgt_vv x y (unmasked) ty))
-
-(rule 1 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.SignedGreaterThan) x (splat y))
-  (rv_vmsgt_vx x y (unmasked) ty))
-
-(rule 2 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.SignedGreaterThan) (splat x) y)
-  (rv_vmslt_vx y x (unmasked) ty))
-
-(rule 3 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.SignedGreaterThan) x y)
-  (if-let y_imm (replicated_imm5 y))
-  (rv_vmsgt_vi x y_imm (unmasked) ty))
-
-;; IntCC.UnsignedGreaterThanOrEqual
-
-(rule 0 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.UnsignedGreaterThanOrEqual) x y)
-  (rv_vmsgeu_vv x y (unmasked) ty))
-
-(rule 2 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.UnsignedGreaterThanOrEqual) (splat x) y)
-  (rv_vmsleu_vx y x (unmasked) ty))
-
-(rule 4 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.UnsignedGreaterThanOrEqual) x y)
-  (if-let x_imm (replicated_imm5 x))
-  (rv_vmsleu_vi y x_imm (unmasked) ty))
-
-;; IntCC.SignedGreaterThanOrEqual
-
-(rule 0 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.SignedGreaterThanOrEqual) x y)
-  (rv_vmsge_vv x y (unmasked) ty))
-
-(rule 2 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.SignedGreaterThanOrEqual) (splat x) y)
-  (rv_vmsle_vx y x (unmasked) ty))
-
-(rule 4 (gen_icmp_mask (ty_vec_fits_in_register ty) (IntCC.SignedGreaterThanOrEqual) x y)
-  (if-let x_imm (replicated_imm5 x))
-  (rv_vmsle_vi y x_imm (unmasked) ty))
-
-
-
 ;; Builds a vector mask corresponding to the FloatCC operation.
 (decl gen_fcmp_mask (Type FloatCC Value Value) VReg)
 

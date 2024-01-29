@@ -30,7 +30,7 @@ block0(v0: i128, v1: i128):
 ;   or a5,a1,a5
 ;   li a4,64
 ;   andi a2,a2,127
-;   select [a0,a1],[a5,a3],[a3,a5]##condition=(a2 uge a4)
+;   select [a0,a1],[a5,a3],[a3,a5]##condition=(a4 ule a2)
 ;   ld s7,8(sp)
 ;   ld s9,0(sp)
 ;   addi sp,sp,16
@@ -361,4 +361,3 @@ block0(v0: i8):
 ;   mv a3, a1
 ;   or a0, a0, a3
 ;   ret
-

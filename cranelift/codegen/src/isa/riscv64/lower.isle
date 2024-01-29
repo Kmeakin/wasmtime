@@ -1899,7 +1899,7 @@
     (gen_select_xreg (cmp_gt x y) x y)))
 
 (rule 1 (lower (has_type $I128 (smax x y)))
-  (gen_select_regs (icmp_to_int_compare (IntCC.SignedGreaterThan) x y) x y))
+  (gen_select_regs (icmp_to_int_compare (IntCC.SignedLessThan) x y) y x))
 
 (rule 2 (lower (has_type (ty_vec_fits_in_register ty) (smax x y)))
   (rv_vmax_vv x y (unmasked) ty))
@@ -1937,7 +1937,7 @@
     (gen_select_xreg (cmp_gtu x y) x y)))
 
 (rule 1 (lower (has_type $I128 (umax x y)))
-  (gen_select_regs (icmp_to_int_compare (IntCC.UnsignedGreaterThan) x y) x y))
+  (gen_select_regs (icmp_to_int_compare (IntCC.UnsignedLessThan) x y) y x))
 
 (rule 2 (lower (has_type (ty_vec_fits_in_register ty) (umax x y)))
   (rv_vmaxu_vv x y (unmasked) ty))
@@ -2132,23 +2132,9 @@
 (rule 1 (lower_icmp (IntCC.SignedLessThan) x y)
   (if-let (i64_from_iconst (i64_nonzero (imm12_from_i64 imm))) y)
   (rv_slti (sext x) imm))
-(rule 1 (lower_icmp (IntCC.SignedGreaterThan) x y)
-  (if-let (i64_from_iconst (i64_nonzero (imm12_from_i64 imm))) x)
-  (rv_slti (sext y) imm))
 (rule 1 (lower_icmp (IntCC.UnsignedLessThan) x y)
   (if-let (u64_from_iconst (u64_nonzero (imm12_from_u64 imm))) y)
   (rv_sltiu (zext x) imm))
-(rule 1 (lower_icmp (IntCC.UnsignedGreaterThan) x y)
-  (if-let (u64_from_iconst (u64_nonzero (imm12_from_u64 imm))) x)
-  (rv_sltiu (zext y) imm))
-
-;; a >= $imm => !(a < $imm)
-(rule 2 (lower_icmp cc @ (IntCC.SignedGreaterThanOrEqual) x y)
-  (if-let (i64_from_iconst (i64_nonzero (imm12_from_i64 _))) y)
-  (rv_xori (lower_icmp (intcc_complement cc) x y) (imm12_const 1)))
-(rule 2 (lower_icmp cc @ (IntCC.UnsignedGreaterThanOrEqual) x y)
-  (if-let (u64_from_iconst (u64_nonzero (imm12_from_u64 _))) y)
-  (rv_xori (lower_icmp (intcc_complement cc) x y) (imm12_const 1)))
 
 ;; Materializes an `IntegerCompare` bundle directly into an `XReg` with a 0
 ;; or 1 value.
@@ -2173,21 +2159,11 @@
   (rv_slt x y))
 (rule (lower_int_compare (int_compare_decompose (IntCC.UnsignedLessThan) x y))
   (rv_sltu x y))
-;; x > y => y < x
-(rule (lower_int_compare (int_compare_decompose (IntCC.SignedGreaterThan) x y))
-  (rv_slt y x))
-(rule (lower_int_compare (int_compare_decompose (IntCC.UnsignedGreaterThan) x y))
-  (rv_sltu y x))
 ;; x <= y => !(y < x)
 (rule (lower_int_compare (int_compare_decompose (IntCC.SignedLessThanOrEqual) x y))
   (rv_xori (rv_slt y x) (imm12_const 1)))
 (rule (lower_int_compare (int_compare_decompose (IntCC.UnsignedLessThanOrEqual) x y))
   (rv_xori (rv_sltu y x) (imm12_const 1)))
-;; x >= y => !(x < y)
-(rule (lower_int_compare (int_compare_decompose (IntCC.SignedGreaterThanOrEqual) x y))
-  (rv_xori (rv_slt x y) (imm12_const 1)))
-(rule (lower_int_compare (int_compare_decompose (IntCC.UnsignedGreaterThanOrEqual) x y))
-  (rv_xori (rv_sltu x y) (imm12_const 1)))
 
 ;; 128-bit comparisons.
 ;;
@@ -2207,21 +2183,11 @@
         (hi XReg (rv_xor (value_regs_get x 1) (value_regs_get y 1))))
     (rv_snez (rv_or lo hi))))
 
-;; swap args for `>` to use `<` instead
-(rule 0 (lower_icmp_i128 cc @ (IntCC.SignedGreaterThan) x y)
-  (lower_icmp_i128 (intcc_swap_args cc) y x))
-(rule 0 (lower_icmp_i128 cc @ (IntCC.UnsignedGreaterThan) x y)
-  (lower_icmp_i128 (intcc_swap_args cc) y x))
-
-;; complement `=`-related conditions to get ones that don't use `=`.
+;; `x <= y` => `!(y < x)`
 (rule 0 (lower_icmp_i128 cc @ (IntCC.SignedLessThanOrEqual) x y)
-  (rv_xori (lower_icmp_i128 (intcc_complement cc) x y) (imm12_const 1)))
-(rule 0 (lower_icmp_i128 cc @ (IntCC.SignedGreaterThanOrEqual) x y)
-  (rv_xori (lower_icmp_i128 (intcc_complement cc) x y) (imm12_const 1)))
+  (rv_xori (lower_icmp_i128 (IntCC.SignedLessThan) y x) (imm12_const 1)))
 (rule 0 (lower_icmp_i128 cc @ (IntCC.UnsignedLessThanOrEqual) x y)
-  (rv_xori (lower_icmp_i128 (intcc_complement cc) x y) (imm12_const 1)))
-(rule 0 (lower_icmp_i128 cc @ (IntCC.UnsignedGreaterThanOrEqual) x y)
-  (rv_xori (lower_icmp_i128 (intcc_complement cc) x y) (imm12_const 1)))
+  (rv_xori (lower_icmp_i128 (IntCC.UnsignedLessThan) y x) (imm12_const 1)))
 
 ;; Compare both the bottom and upper halves of the 128-bit values. If
 ;; the top half is equal use the bottom comparison, otherwise use the upper

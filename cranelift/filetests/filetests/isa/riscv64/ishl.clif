@@ -361,7 +361,7 @@ block0(v0: i128, v1: i8):
 ;   or a5,a3,a5
 ;   li a3,64
 ;   andi a2,a2,127
-;   select [a0,a1],[zero,a4],[a4,a5]##condition=(a2 uge a3)
+;   select [a0,a1],[zero,a4],[a4,a5]##condition=(a3 ule a2)
 ;   ret
 ;
 ; Disassembled:
@@ -405,7 +405,7 @@ block0(v0: i128, v1: i16):
 ;   or a5,a3,a5
 ;   li a3,64
 ;   andi a2,a2,127
-;   select [a0,a1],[zero,a4],[a4,a5]##condition=(a2 uge a3)
+;   select [a0,a1],[zero,a4],[a4,a5]##condition=(a3 ule a2)
 ;   ret
 ;
 ; Disassembled:
@@ -449,7 +449,7 @@ block0(v0: i128, v1: i32):
 ;   or a5,a3,a5
 ;   li a3,64
 ;   andi a2,a2,127
-;   select [a0,a1],[zero,a4],[a4,a5]##condition=(a2 uge a3)
+;   select [a0,a1],[zero,a4],[a4,a5]##condition=(a3 ule a2)
 ;   ret
 ;
 ; Disassembled:
@@ -493,7 +493,7 @@ block0(v0: i128, v1: i64):
 ;   or a5,a3,a5
 ;   li a3,64
 ;   andi a2,a2,127
-;   select [a0,a1],[zero,a4],[a4,a5]##condition=(a2 uge a3)
+;   select [a0,a1],[zero,a4],[a4,a5]##condition=(a3 ule a2)
 ;   ret
 ;
 ; Disassembled:
@@ -539,7 +539,7 @@ block0(v0: i128, v1: i128):
 ;   or a4,a3,a0
 ;   li a3,64
 ;   andi a2,a2,127
-;   select [a0,a1],[zero,a5],[a5,a4]##condition=(a2 uge a3)
+;   select [a0,a1],[zero,a5],[a5,a4]##condition=(a3 ule a2)
 ;   ret
 ;
 ; Disassembled:

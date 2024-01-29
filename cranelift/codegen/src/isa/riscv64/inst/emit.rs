@@ -1782,20 +1782,41 @@ impl Inst {
                         .iter()
                         .for_each(|i| i.emit(&[], sink, emit_info, state));
 
+                        let (kind, taken, not_taken, rs1, rs2) = match op {
+                            crate::ir::AtomicRmwOp::Umin => (
+                                IntCC::UnsignedLessThan,
+                                CondBrTarget::Label(label_select_dst),
+                                CondBrTarget::Fallthrough,
+                                dst.to_reg(),
+                                x,
+                            ),
+                            crate::ir::AtomicRmwOp::Smin => (
+                                IntCC::SignedLessThan,
+                                CondBrTarget::Label(label_select_dst),
+                                CondBrTarget::Fallthrough,
+                                dst.to_reg(),
+                                x,
+                            ),
+                            crate::ir::AtomicRmwOp::Umax => (
+                                IntCC::UnsignedLessThan,
+                                CondBrTarget::Fallthrough,
+                                CondBrTarget::Label(label_select_dst),
+                                x,
+                                dst.to_reg(),
+                            ),
+                            crate::ir::AtomicRmwOp::Smax => (
+                                IntCC::SignedLessThan,
+                                CondBrTarget::Fallthrough,
+                                CondBrTarget::Label(label_select_dst),
+                                x,
+                                dst.to_reg(),
+                            ),
+                            _ => unreachable!(),
+                        };
                         Inst::CondBr {
-                            taken: CondBrTarget::Label(label_select_dst),
-                            not_taken: CondBrTarget::Fallthrough,
-                            kind: IntegerCompare {
-                                kind: match op {
-                                    crate::ir::AtomicRmwOp::Umin => IntCC::UnsignedLessThan,
-                                    crate::ir::AtomicRmwOp::Umax => IntCC::UnsignedGreaterThan,
-                                    crate::ir::AtomicRmwOp::Smin => IntCC::SignedLessThan,
-                                    crate::ir::AtomicRmwOp::Smax => IntCC::SignedGreaterThan,
-                                    _ => unreachable!(),
-                                },
-                                rs1: dst.to_reg(),
-                                rs2: x,
-                            },
+                            taken,
+                            not_taken,
+                            kind: IntegerCompare { kind, rs1, rs2 },
                         }
                         .emit(&[], sink, emit_info, state);
                         // here we select x.
