@@ -3894,23 +3894,6 @@
       (if (ty_int_ref_scalar_64 ty))
       (flags_and_cc (cmp (operand_size ty) rn rm) cond))
 
-;; We get better encodings when testing against an immediate that's even instead
-;; of odd, so rewrite comparisons to use even immediates:
-;;
-;;         A >= B + 1
-;;     ==> A - 1 >= B
-;;     ==> A > B
-(rule (lower_icmp_const (IntCC.UnsignedGreaterThanOrEqual) a b ty)
-      (if (ty_int_ref_scalar_64 ty))
-      (if-let $true (u64_is_odd b))
-      (if-let (imm12_from_u64 imm) (u64_sub b 1))
-  (flags_and_cc (cmp_imm (operand_size ty) a imm) (IntCC.UnsignedGreaterThan)))
-(rule (lower_icmp_const (IntCC.SignedGreaterThanOrEqual) a b ty)
-      (if (ty_int_ref_scalar_64 ty))
-      (if-let $true (u64_is_odd b))
-      (if-let (imm12_from_u64 imm) (u64_sub b 1))
-  (flags_and_cc (cmp_imm (operand_size ty) a imm) (IntCC.SignedGreaterThan)))
-
 (rule -1 (lower_icmp_const cond rn (imm12_from_u64 c) ty)
       (if (ty_int_ref_scalar_64 ty))
   (flags_and_cc (cmp_imm (operand_size ty) rn c) cond))
@@ -4027,16 +4010,6 @@
 ;; Exceptional `lower_icmp_into_flags` rules.
 ;; We need to guarantee that the flags for `cond` are correct, so we
 ;; compare `dst` with 1.
-(rule (lower_icmp_into_flags cond @ (IntCC.SignedGreaterThanOrEqual) lhs rhs $I128)
-      (let ((dst ValueRegs (lower_icmp_into_reg cond lhs rhs $I128 $I8))
-            (dst Reg (value_regs_get dst 0))
-            (tmp Reg (imm $I64 (ImmExtend.Sign) 1))) ;; mov tmp, #1
-        (flags_and_cc (cmp (OperandSize.Size64) dst tmp) cond)))
-(rule (lower_icmp_into_flags cond @ (IntCC.UnsignedGreaterThanOrEqual) lhs rhs $I128)
-      (let ((dst ValueRegs (lower_icmp_into_reg cond lhs rhs $I128 $I8))
-            (dst Reg (value_regs_get dst 0))
-            (tmp Reg (imm $I64 (ImmExtend.Zero) 1)))
-        (flags_and_cc (cmp (OperandSize.Size64) dst tmp) cond)))
 (rule (lower_icmp_into_flags cond @ (IntCC.SignedLessThanOrEqual) lhs rhs $I128)
       (let ((dst ValueRegs (lower_icmp_into_reg cond lhs rhs $I128 $I8))
             (dst Reg (value_regs_get dst 0))
@@ -4048,14 +4021,6 @@
             (tmp Reg (imm $I64 (ImmExtend.Zero) 1)))
         (flags_and_cc (cmp (OperandSize.Size64) tmp dst) cond)))
 ;; For strict comparisons, we compare with 0.
-(rule (lower_icmp_into_flags cond @ (IntCC.SignedGreaterThan) lhs rhs $I128)
-      (let ((dst ValueRegs (lower_icmp_into_reg cond lhs rhs $I128 $I8))
-            (dst Reg (value_regs_get dst 0)))
-        (flags_and_cc (cmp (OperandSize.Size64) dst (zero_reg)) cond)))
-(rule (lower_icmp_into_flags cond @ (IntCC.UnsignedGreaterThan) lhs rhs $I128)
-      (let ((dst ValueRegs (lower_icmp_into_reg cond lhs rhs $I128 $I8))
-            (dst Reg (value_regs_get dst 0)))
-        (flags_and_cc (cmp (OperandSize.Size64) dst (zero_reg)) cond)))
 (rule (lower_icmp_into_flags cond @ (IntCC.SignedLessThan) lhs rhs $I128)
       (let ((dst ValueRegs (lower_icmp_into_reg cond lhs rhs $I128 $I8))
             (dst Reg (value_regs_get dst 0)))
