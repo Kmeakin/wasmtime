@@ -9,6 +9,7 @@ use crate::testcommand::TestCommand;
 use crate::testfile::{Comment, Details, Feature, TestFile};
 use cranelift_codegen::data_value::DataValue;
 use cranelift_codegen::entity::{EntityRef, PrimaryMap};
+use cranelift_codegen::ir::condcodes::{CondCode, IntCC};
 use cranelift_codegen::ir::entities::{AnyEntity, DynamicType, MemoryType};
 use cranelift_codegen::ir::immediates::{Ieee32, Ieee64, Imm64, Offset32, Uimm32, Uimm64};
 use cranelift_codegen::ir::instructions::{InstructionData, InstructionFormat, VariableArgs};
@@ -2754,7 +2755,7 @@ impl<'a> Parser<'a> {
     fn parse_inst_operands(
         &mut self,
         ctx: &mut Context,
-        opcode: Opcode,
+        mut opcode: Opcode,
         explicit_control_type: Option<Type>,
     ) -> ParseResult<InstructionData> {
         let idata = match opcode.format() {
@@ -2931,10 +2932,14 @@ impl<'a> Parser<'a> {
                 }
             }
             InstructionFormat::IntCompare => {
-                let cond = self.match_enum("expected intcc condition code")?;
-                let lhs = self.match_value("expected SSA value first operand")?;
+                let mut cond: IntCC = self.match_enum("expected intcc condition code")?;
+                let mut lhs = self.match_value("expected SSA value first operand")?;
                 self.match_token(Token::Comma, "expected ',' between operands")?;
-                let rhs = self.match_value("expected SSA value second operand")?;
+                let mut rhs = self.match_value("expected SSA value second operand")?;
+                if cond.is_greater() {
+                    cond = cond.swap_args();
+                    std::mem::swap(&mut lhs, &mut rhs);
+                }
                 InstructionData::IntCompare {
                     opcode,
                     cond,
@@ -2942,10 +2947,18 @@ impl<'a> Parser<'a> {
                 }
             }
             InstructionFormat::IntCompareImm => {
-                let cond = self.match_enum("expected intcc condition code")?;
+                let mut cond: IntCC = self.match_enum("expected intcc condition code")?;
                 let lhs = self.match_value("expected SSA value first operand")?;
                 self.match_token(Token::Comma, "expected ',' between operands")?;
                 let rhs = self.match_imm64("expected immediate second operand")?;
+                if cond.is_greater() {
+                    cond = cond.swap_args();
+                    opcode = match opcode {
+                        Opcode::IcmpImm => Opcode::IrcmpImm,
+                        Opcode::IrcmpImm => Opcode::IcmpImm,
+                        _ => unreachable!(),
+                    };
+                }
                 InstructionData::IntCompareImm {
                     opcode,
                     cond,

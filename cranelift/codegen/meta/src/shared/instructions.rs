@@ -1638,6 +1638,28 @@ pub(crate) fn define(
 
     ig.push(
         Inst::new(
+            "ircmp_imm",
+            r#"
+        Compare scalar integer to a constant.
+
+        This is the same as the `icmp_imm` instruction, the operands are
+        swapped.
+
+        This instruction can only compare scalars. Use `icmp` for
+        lane-wise vector comparisons.
+        "#,
+            &formats.int_compare_imm,
+        )
+        .operands_in(vec![
+            Operand::new("Cond", &imm.intcc),
+            Operand::new("x", iB),
+            Operand::new("Y", &imm.imm64),
+        ])
+        .operands_out(vec![Operand::new("a", i8)]),
+    );
+
+    ig.push(
+        Inst::new(
             "iadd",
             r#"
         Wrapping integer addition: `a := x + y \pmod{2^B}`.

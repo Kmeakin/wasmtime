@@ -568,6 +568,12 @@ where
             &arg(0),
             &imm_as_ctrl_ty()?,
         )?),
+        Opcode::IrcmpImm => assign(icmp(
+            ctrl_ty,
+            inst.cond_code().unwrap(),
+            &imm_as_ctrl_ty()?,
+            &arg(0),
+        )?),
         Opcode::Smin => {
             if ctrl_ty.is_vector() {
                 let icmp = icmp(ctrl_ty, IntCC::SignedGreaterThan, &arg(1), &arg(0))?;

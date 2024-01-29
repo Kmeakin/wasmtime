@@ -184,8 +184,8 @@ block0:
     return v2
 }
 
-; check: v3 = iconst.i8 0
-; nextln: return v3
+; check: v5 = iconst.i8 0
+; nextln: return v5
 
 function %icmp_slt_i32() -> i8 {
 block0:
@@ -217,8 +217,8 @@ block0:
     return v2
 }
 
-; check: v3 = iconst.i8 0
-; nextln: return v3
+; check: v5 = iconst.i8 0
+; nextln: return v5
 
 function %icmp_sgt_i32() -> i8 {
 block0:

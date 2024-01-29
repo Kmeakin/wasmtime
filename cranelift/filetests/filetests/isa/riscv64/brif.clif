@@ -316,7 +316,7 @@ block2:
 
 ; VCode:
 ; block0:
-;   bgeu a0,a1,taken(label2),not_taken(label1)
+;   bleu a1,a0,taken(label2),not_taken(label1)
 ; block1:
 ;   li a0,0
 ;   ret

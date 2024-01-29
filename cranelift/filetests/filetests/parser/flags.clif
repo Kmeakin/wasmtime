@@ -28,7 +28,7 @@ block202:
 ; check: v17 = iconst.i32 17
 ; check: v1 = icmp eq v0, v17
 ; check: brif v1, block201, block400
-; check: v5 = icmp.i32 ugt v0, v17
+; check: v5 = icmp.i32 ult v17, v0
 ; check: brif v5, block202, block401
 ; check: v3 = icmp.i32 eq v0, v2
 

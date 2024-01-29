@@ -14,14 +14,18 @@ block0(v0: i32):
 
 ; VCode:
 ; block0:
-;   subs wzr, w0, #1118208
-;   cset x0, hi
+;   movz w4, #4097
+;   movk w4, w4, #17, LSL #16
+;   subs wzr, w4, w0
+;   cset x0, ls
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp w0, #0x111, lsl #12
-;   cset x0, hi
+;   mov w4, #0x1001
+;   movk w4, #0x11, lsl #16
+;   cmp w4, w0
+;   cset x0, ls
 ;   ret
 
 function %b(i32) -> i8 {
@@ -33,14 +37,18 @@ block0(v0: i32):
 
 ; VCode:
 ; block0:
-;   subs wzr, w0, #1118208
-;   cset x0, hs
+;   movz w4, #4096
+;   movk w4, w4, #17, LSL #16
+;   subs wzr, w4, w0
+;   cset x0, ls
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp w0, #0x111, lsl #12
-;   cset x0, hs
+;   mov w4, #0x1000
+;   movk w4, #0x11, lsl #16
+;   cmp w4, w0
+;   cset x0, ls
 ;   ret
 
 function %c(i32) -> i8 {
@@ -52,18 +60,18 @@ block0(v0: i32):
 
 ; VCode:
 ; block0:
-;   movz w3, #4369
-;   movk w3, w3, #17, LSL #16
-;   subs wzr, w0, w3
-;   cset x0, hs
+;   movz w4, #4369
+;   movk w4, w4, #17, LSL #16
+;   subs wzr, w4, w0
+;   cset x0, ls
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   mov w3, #0x1111
-;   movk w3, #0x11, lsl #16
-;   cmp w0, w3
-;   cset x0, hs
+;   mov w4, #0x1111
+;   movk w4, #0x11, lsl #16
+;   cmp w4, w0
+;   cset x0, ls
 ;   ret
 
 function %d(i32) -> i8 {
@@ -75,18 +83,18 @@ block0(v0: i32):
 
 ; VCode:
 ; block0:
-;   movz w3, #4368
-;   movk w3, w3, #17, LSL #16
-;   subs wzr, w0, w3
-;   cset x0, hs
+;   movz w4, #4368
+;   movk w4, w4, #17, LSL #16
+;   subs wzr, w4, w0
+;   cset x0, ls
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   mov w3, #0x1110
-;   movk w3, #0x11, lsl #16
-;   cmp w0, w3
-;   cset x0, hs
+;   mov w4, #0x1110
+;   movk w4, #0x11, lsl #16
+;   cmp w4, w0
+;   cset x0, ls
 ;   ret
 
 function %e(i32) -> i8 {
@@ -98,14 +106,18 @@ block0(v0: i32):
 
 ; VCode:
 ; block0:
-;   subs wzr, w0, #1118208
-;   cset x0, gt
+;   movz w4, #4097
+;   movk w4, w4, #17, LSL #16
+;   subs wzr, w4, w0
+;   cset x0, le
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp w0, #0x111, lsl #12
-;   cset x0, gt
+;   mov w4, #0x1001
+;   movk w4, #0x11, lsl #16
+;   cmp w4, w0
+;   cset x0, le
 ;   ret
 
 function %f(i32) -> i8 {
@@ -117,14 +129,18 @@ block0(v0: i32):
 
 ; VCode:
 ; block0:
-;   subs wzr, w0, #1118208
-;   cset x0, ge
+;   movz w4, #4096
+;   movk w4, w4, #17, LSL #16
+;   subs wzr, w4, w0
+;   cset x0, le
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp w0, #0x111, lsl #12
-;   cset x0, ge
+;   mov w4, #0x1000
+;   movk w4, #0x11, lsl #16
+;   cmp w4, w0
+;   cset x0, le
 ;   ret
 
 function %g(i32) -> i8 {
@@ -136,18 +152,18 @@ block0(v0: i32):
 
 ; VCode:
 ; block0:
-;   movz w3, #4369
-;   movk w3, w3, #17, LSL #16
-;   subs wzr, w0, w3
-;   cset x0, ge
+;   movz w4, #4369
+;   movk w4, w4, #17, LSL #16
+;   subs wzr, w4, w0
+;   cset x0, le
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   mov w3, #0x1111
-;   movk w3, #0x11, lsl #16
-;   cmp w0, w3
-;   cset x0, ge
+;   mov w4, #0x1111
+;   movk w4, #0x11, lsl #16
+;   cmp w4, w0
+;   cset x0, le
 ;   ret
 
 function %h(i32) -> i8 {
@@ -159,17 +175,17 @@ block0(v0: i32):
 
 ; VCode:
 ; block0:
-;   movz w3, #4368
-;   movk w3, w3, #17, LSL #16
-;   subs wzr, w0, w3
-;   cset x0, ge
+;   movz w4, #4368
+;   movk w4, w4, #17, LSL #16
+;   subs wzr, w4, w0
+;   cset x0, le
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   mov w3, #0x1110
-;   movk w3, #0x11, lsl #16
-;   cmp w0, w3
-;   cset x0, ge
+;   mov w4, #0x1110
+;   movk w4, #0x11, lsl #16
+;   cmp w4, w0
+;   cset x0, le
 ;   ret
 

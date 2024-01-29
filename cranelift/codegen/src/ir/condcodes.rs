@@ -150,6 +150,17 @@ impl IntCC {
             UnsignedLessThanOrEqual => "ule",
         }
     }
+
+    /// Return true if this IntCC tests for `x > y` or `x >= y`
+    pub fn is_greater(self) -> bool {
+        matches!(
+            self,
+            Self::SignedGreaterThan
+                | Self::SignedGreaterThanOrEqual
+                | Self::UnsignedGreaterThan
+                | Self::UnsignedGreaterThanOrEqual
+        )
+    }
 }
 
 impl Display for IntCC {

@@ -809,8 +809,8 @@ block0(v0: i32, v1: i32):
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   cmpl    %esi, %edi
-;   setnle  %al
+;   cmpl    %edi, %esi
+;   setl    %al
 ;   movq    %rax, %r8
 ;   negb    %r8b, %r8b
 ;   sbbl    %eax, %eax, %eax
@@ -823,8 +823,8 @@ block0(v0: i32, v1: i32):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   cmpl %esi, %edi
-;   setg %al
+;   cmpl %edi, %esi
+;   setl %al
 ;   movq %rax, %r8
 ;   negb %r8b
 ;   sbbl %eax, %eax
@@ -843,8 +843,8 @@ block0(v0: i32, v1: i32):
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   cmpl    %esi, %edi
-;   setnle  %al
+;   cmpl    %edi, %esi
+;   setl    %al
 ;   negb    %al, %al
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
@@ -855,9 +855,10 @@ block0(v0: i32, v1: i32):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   cmpl %esi, %edi
-;   setg %al
+;   cmpl %edi, %esi
+;   setl %al
 ;   negb %al
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
+

@@ -50,8 +50,8 @@ block0:
 ;     v1 = iconcat v0, v0  ; v0 = 0x6350_5050_5050_3750, v0 = 0x6350_5050_5050_3750
 ;     v2 = bmask.i8 v1
 ;     v3 = iconst.i8 0
-;     v5 = icmp ne v2, v3  ; v3 = 0
-;     return v5
+;     v6 = icmp ne v2, v3  ; v3 = 0
+;     return v6
 ; }
 
 function %sge_one(i64) -> i8 {
@@ -63,9 +63,9 @@ block0(v0: i64):
 
 ; function %sge_one(i64) -> i8 fast {
 ; block0(v0: i64):
-;     v3 = iconst.i64 0
-;     v4 = icmp sgt v0, v3  ; v3 = 0
-;     return v4
+;     v4 = iconst.i64 0
+;     v5 = icmp sgt v0, v4  ; v4 = 0
+;     return v5
 ; }
 
 function %slt_one(i16) -> i8 {
@@ -91,9 +91,9 @@ block0(v0: i32):
 
 ; function %uge_one(i32) -> i8 fast {
 ; block0(v0: i32):
-;     v3 = iconst.i32 0
-;     v4 = icmp ne v0, v3  ; v3 = 0
-;     return v4
+;     v4 = iconst.i32 0
+;     v5 = icmp ne v0, v4  ; v4 = 0
+;     return v5
 ; }
 
 function %ult_one(i8) -> i8 {
@@ -121,8 +121,8 @@ block0(v0: i8):
 ; function %byte_icmp_ucmp(i8) -> i8 fast {
 ; block0(v0: i8):
 ;     v1 = iconst.i8 0
-;     v4 = icmp slt v0, v1  ; v1 = 0
-;     return v4
+;     v6 = icmp slt v0, v1  ; v1 = 0
+;     return v6
 ; }
 
 function %eq_one_of_icmp(i8) -> i8 fast {

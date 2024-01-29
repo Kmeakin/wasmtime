@@ -227,6 +227,15 @@ pub fn simple_legalize(func: &mut ir::Function, cfg: &mut ControlFlowGraph, isa:
                     let imm = imm_const(&mut pos, arg, imm, true);
                     pos.func.dfg.replace(inst).icmp(cond, arg, imm);
                 }
+                InstructionData::IntCompareImm {
+                    opcode: ir::Opcode::IrcmpImm,
+                    cond,
+                    arg,
+                    imm,
+                } => {
+                    let imm = imm_const(&mut pos, arg, imm, true);
+                    pos.func.dfg.replace(inst).icmp(cond, imm, arg);
+                }
 
                 // Legalize the fused bitwise-plus-not instructions into simpler
                 // instructions to assist with optimizations. Lowering will

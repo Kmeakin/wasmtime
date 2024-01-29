@@ -27,7 +27,7 @@ block0(v0: i32, v1: i32):
 }
 
 ; check: block0(v0: i32, v1: i32):
-; check:    v4 = smax v0, v1
+; check:    v4 = smax v1, v0
 ; check:    return v4
 
 
@@ -40,7 +40,7 @@ block0(v0: i32, v1: i32):
 }
 
 ; check: block0(v0: i32, v1: i32):
-; check:    v4 = smin v0, v1
+; check:    v4 = smin v1, v0
 ; check:    return v4
 
 
@@ -52,7 +52,7 @@ block0(v0: i32, v1: i32):
 }
 
 ; check: block0(v0: i32, v1: i32):
-; check:    v4 = smax v0, v1
+; check:    v4 = smax v1, v0
 ; check:    return v4
 
 
@@ -64,7 +64,7 @@ block0(v0: i32, v1: i32):
 }
 
 ; check: block0(v0: i32, v1: i32):
-; check:    v4 = umax v0, v1
+; check:    v4 = umax v1, v0
 ; check:    return v4
 
 
@@ -76,7 +76,7 @@ block0(v0: i32, v1: i32):
 }
 
 ; check: block0(v0: i32, v1: i32):
-; check:    v4 = umax v0, v1
+; check:    v4 = umax v1, v0
 ; check:    return v4
 
 

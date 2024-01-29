@@ -164,19 +164,19 @@ block0(v0: i128, v1: i128):
 
 ; VCode:
 ; block0:
-;   subs xzr, x0, x2
-;   cset x6, hi
-;   subs xzr, x1, x3
-;   cset x9, gt
+;   subs xzr, x2, x0
+;   cset x6, lo
+;   subs xzr, x3, x1
+;   cset x9, lt
 ;   csel x0, x6, x9, eq
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp x0, x2
-;   cset x6, hi
-;   cmp x1, x3
-;   cset x9, gt
+;   cmp x2, x0
+;   cset x6, lo
+;   cmp x3, x1
+;   cset x9, lt
 ;   csel x0, x6, x9, eq
 ;   ret
 
@@ -188,19 +188,19 @@ block0(v0: i128, v1: i128):
 
 ; VCode:
 ; block0:
-;   subs xzr, x0, x2
-;   cset x6, hi
-;   subs xzr, x1, x3
-;   cset x9, hi
+;   subs xzr, x2, x0
+;   cset x6, lo
+;   subs xzr, x3, x1
+;   cset x9, lo
 ;   csel x0, x6, x9, eq
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp x0, x2
-;   cset x6, hi
-;   cmp x1, x3
-;   cset x9, hi
+;   cmp x2, x0
+;   cset x6, lo
+;   cmp x3, x1
+;   cset x9, lo
 ;   csel x0, x6, x9, eq
 ;   ret
 
@@ -212,19 +212,19 @@ block0(v0: i128, v1: i128):
 
 ; VCode:
 ; block0:
-;   subs xzr, x0, x2
-;   cset x6, hs
-;   subs xzr, x1, x3
-;   cset x9, ge
+;   subs xzr, x2, x0
+;   cset x6, ls
+;   subs xzr, x3, x1
+;   cset x9, le
 ;   csel x0, x6, x9, eq
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp x0, x2
-;   cset x6, hs
-;   cmp x1, x3
-;   cset x9, ge
+;   cmp x2, x0
+;   cset x6, ls
+;   cmp x3, x1
+;   cset x9, le
 ;   csel x0, x6, x9, eq
 ;   ret
 
@@ -236,19 +236,19 @@ block0(v0: i128, v1: i128):
 
 ; VCode:
 ; block0:
-;   subs xzr, x0, x2
-;   cset x6, hs
-;   subs xzr, x1, x3
-;   cset x9, hs
+;   subs xzr, x2, x0
+;   cset x6, ls
+;   subs xzr, x3, x1
+;   cset x9, ls
 ;   csel x0, x6, x9, eq
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp x0, x2
-;   cset x6, hs
-;   cmp x1, x3
-;   cset x9, hs
+;   cmp x2, x0
+;   cset x6, ls
+;   cmp x3, x1
+;   cset x9, ls
 ;   csel x0, x6, x9, eq
 ;   ret
 
@@ -593,13 +593,13 @@ block1:
 
 ; VCode:
 ; block0:
-;   subs xzr, x0, x2
-;   cset x6, hi
-;   subs xzr, x1, x3
-;   cset x9, gt
+;   subs xzr, x2, x0
+;   cset x6, lo
+;   subs xzr, x3, x1
+;   cset x9, lt
 ;   csel x11, x6, x9, eq
-;   subs xzr, x11, xzr
-;   b.gt label1 ; b label2
+;   subs xzr, xzr, x11
+;   b.lt label1 ; b label2
 ; block1:
 ;   b label3
 ; block2:
@@ -609,12 +609,12 @@ block1:
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp x0, x2
-;   cset x6, hi
-;   cmp x1, x3
-;   cset x9, gt
+;   cmp x2, x0
+;   cset x6, lo
+;   cmp x3, x1
+;   cset x9, lt
 ;   csel x11, x6, x9, eq
-;   cmp x11, xzr
+;   cmp xzr, x11
 ; block1: ; offset 0x18
 ;   ret
 
@@ -630,13 +630,13 @@ block1:
 
 ; VCode:
 ; block0:
-;   subs xzr, x0, x2
-;   cset x6, hi
-;   subs xzr, x1, x3
-;   cset x9, hi
+;   subs xzr, x2, x0
+;   cset x6, lo
+;   subs xzr, x3, x1
+;   cset x9, lo
 ;   csel x11, x6, x9, eq
-;   subs xzr, x11, xzr
-;   b.hi label1 ; b label2
+;   subs xzr, xzr, x11
+;   b.lo label1 ; b label2
 ; block1:
 ;   b label3
 ; block2:
@@ -646,12 +646,12 @@ block1:
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp x0, x2
-;   cset x6, hi
-;   cmp x1, x3
-;   cset x9, hi
+;   cmp x2, x0
+;   cset x6, lo
+;   cmp x3, x1
+;   cset x9, lo
 ;   csel x11, x6, x9, eq
-;   cmp x11, xzr
+;   cmp xzr, x11
 ; block1: ; offset 0x18
 ;   ret
 
@@ -667,14 +667,14 @@ block1:
 
 ; VCode:
 ; block0:
-;   subs xzr, x0, x2
-;   cset x6, hs
-;   subs xzr, x1, x3
-;   cset x9, ge
+;   subs xzr, x2, x0
+;   cset x6, ls
+;   subs xzr, x3, x1
+;   cset x9, le
 ;   csel x11, x6, x9, eq
 ;   movz w13, #1
-;   subs xzr, x11, x13
-;   b.ge label1 ; b label2
+;   subs xzr, x13, x11
+;   b.le label1 ; b label2
 ; block1:
 ;   b label3
 ; block2:
@@ -684,13 +684,13 @@ block1:
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp x0, x2
-;   cset x6, hs
-;   cmp x1, x3
-;   cset x9, ge
+;   cmp x2, x0
+;   cset x6, ls
+;   cmp x3, x1
+;   cset x9, le
 ;   csel x11, x6, x9, eq
 ;   mov w13, #1
-;   cmp x11, x13
+;   cmp x13, x11
 ; block1: ; offset 0x1c
 ;   ret
 
@@ -706,14 +706,14 @@ block1:
 
 ; VCode:
 ; block0:
-;   subs xzr, x0, x2
-;   cset x6, hs
-;   subs xzr, x1, x3
-;   cset x9, hs
+;   subs xzr, x2, x0
+;   cset x6, ls
+;   subs xzr, x3, x1
+;   cset x9, ls
 ;   csel x11, x6, x9, eq
 ;   movz x13, #1
-;   subs xzr, x11, x13
-;   b.hs label1 ; b label2
+;   subs xzr, x13, x11
+;   b.ls label1 ; b label2
 ; block1:
 ;   b label3
 ; block2:
@@ -723,13 +723,13 @@ block1:
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cmp x0, x2
-;   cset x6, hs
-;   cmp x1, x3
-;   cset x9, hs
+;   cmp x2, x0
+;   cset x6, ls
+;   cmp x3, x1
+;   cset x9, ls
 ;   csel x11, x6, x9, eq
 ;   mov x13, #1
-;   cmp x11, x13
+;   cmp x13, x11
 ; block1: ; offset 0x1c
 ;   ret
 
