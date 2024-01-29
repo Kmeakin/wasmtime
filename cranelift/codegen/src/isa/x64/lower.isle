@@ -1844,32 +1844,16 @@
 (rule 2 (lower (has_type $I8 (icmp (IntCC.SignedLessThan) x @ (value_type $I64) (u64_from_iconst 0))))
       (x64_shr $I64 x (Imm8Reg.Imm8 63)))
 
-;; Peephole optimization for `0 > x`, when x is a signed 64 bit value
-(rule 2 (lower (has_type $I8 (icmp (IntCC.SignedGreaterThan) (u64_from_iconst 0) x @ (value_type $I64))))
-      (x64_shr $I64 x (Imm8Reg.Imm8 63)))
-
 ;; Peephole optimization for `0 <= x`, when x is a signed 64 bit value
 (rule 2 (lower (has_type $I8 (icmp (IntCC.SignedLessThanOrEqual) (u64_from_iconst 0) x @ (value_type $I64))))
-      (x64_shr $I64 (x64_not $I64 x) (Imm8Reg.Imm8 63)))
-
-;; Peephole optimization for `x >= 0`, when x is a signed 64 bit value
-(rule 2 (lower (has_type $I8 (icmp (IntCC.SignedGreaterThanOrEqual) x @ (value_type $I64) (u64_from_iconst 0))))
       (x64_shr $I64 (x64_not $I64 x) (Imm8Reg.Imm8 63)))
 
 ;; Peephole optimization for `x < 0`, when x is a signed 32 bit value
 (rule 2 (lower (has_type $I8 (icmp (IntCC.SignedLessThan) x @ (value_type $I32) (u64_from_iconst 0))))
       (x64_shr $I32 x (Imm8Reg.Imm8 31)))
 
-;; Peephole optimization for `0 > x`, when x is a signed 32 bit value
-(rule 2 (lower (has_type $I8 (icmp (IntCC.SignedGreaterThan) (u64_from_iconst 0) x @ (value_type $I32))))
-      (x64_shr $I32 x (Imm8Reg.Imm8 31)))
-
 ;; Peephole optimization for `0 <= x`, when x is a signed 32 bit value
 (rule 2 (lower (has_type $I8 (icmp (IntCC.SignedLessThanOrEqual) (u64_from_iconst 0) x @ (value_type $I32))))
-      (x64_shr $I32 (x64_not $I64 x) (Imm8Reg.Imm8 31)))
-
-;; Peephole optimization for `x >= 0`, when x is a signed 32 bit value
-(rule 2 (lower (has_type $I8 (icmp (IntCC.SignedGreaterThanOrEqual) x @ (value_type $I32) (u64_from_iconst 0))))
       (x64_shr $I32 (x64_not $I64 x) (Imm8Reg.Imm8 31)))
 
 ;; For XMM-held values, we lower to `PCMP*` instructions, sometimes more than
@@ -1887,35 +1871,10 @@
             (all_ones Xmm (vector_all_ones)))
            (x64_pxor checked all_ones)))
 
-;; SSE `sgt`
-
-(rule (lower (icmp (IntCC.SignedGreaterThan) a @ (value_type (ty_vec128 ty)) b))
-      (x64_pcmpgt ty a b))
-
 ;; SSE `slt`
 
 (rule (lower (icmp (IntCC.SignedLessThan) a @ (value_type (ty_vec128 ty)) b))
       (x64_pcmpgt ty b a))
-
-;; SSE `ugt`
-
-;; N.B.: we must manually prevent load coalescing operands; the
-;; register allocator gets confused otherwise.
-(rule 1 (lower (icmp (IntCC.UnsignedGreaterThan) a @ (value_type (ty_vec128 ty)) b))
-        (if-let $true (has_pmaxu ty))
-        (let ((a Xmm a)
-              (b Xmm b)
-              (max Xmm (x64_pmaxu ty a b))
-              (eq Xmm (x64_pcmpeq ty max b)))
-             (x64_pxor eq (vector_all_ones))))
-
-;; Flip the upper bit of each lane so the result of a signed comparison is the
-;; same as the result of an unsigned comparison (see docs on `pcmpgt` for more)
-(rule (lower (icmp (IntCC.UnsignedGreaterThan) a @ (value_type (ty_vec128 ty)) b))
-      (let ((mask Xmm (flip_high_bit_mask ty))
-            (a_masked Xmm (x64_pxor a mask))
-            (b_masked Xmm (x64_pxor b mask)))
-           (x64_pcmpgt ty a_masked b_masked)))
 
 ;; SSE `ult`
 
@@ -1936,18 +1895,6 @@
             (b_masked Xmm (x64_pxor b mask)))
            (x64_pcmpgt ty b_masked a_masked)))
 
-;; SSE `sge`
-
-;; Use `pmaxs*` and compare the result to `a` to see if it's `>= b`.
-(rule 1 (lower (icmp (IntCC.SignedGreaterThanOrEqual) a @ (value_type (ty_vec128 ty)) b))
-        (if-let $true (has_pmaxs ty))
-        (x64_pcmpeq ty a (x64_pmaxs ty a b)))
-
-;; Without `pmaxs*` use a `pcmpgt*` with reversed operands and invert the
-;; result.
-(rule (lower (icmp (IntCC.SignedGreaterThanOrEqual) a @ (value_type (ty_vec128 ty)) b))
-      (x64_pxor (x64_pcmpgt ty b a) (vector_all_ones)))
-
 ;; SSE `sle`
 
 ;; With `pmins*` use that and compare the result to `a`.
@@ -1958,29 +1905,6 @@
 ;; Without `pmins*` perform a greater-than test and invert the result.
 (rule (lower (icmp (IntCC.SignedLessThanOrEqual) a @ (value_type (ty_vec128 ty)) b))
       (x64_pxor (x64_pcmpgt ty a b) (vector_all_ones)))
-
-;; SSE `uge`
-
-(rule 2 (lower (icmp (IntCC.UnsignedGreaterThanOrEqual) a @ (value_type (ty_vec128 ty)) b))
-        (if-let $true (has_pmaxu ty))
-        (x64_pcmpeq ty a (x64_pmaxu ty a b)))
-
-;; Perform a saturating subtract of `a` from `b` and if the result is zero then
-;; `a` is greater or equal.
-(rule 1 (lower (icmp (IntCC.UnsignedGreaterThanOrEqual) a @ (value_type $I16X8) b))
-         (x64_pcmpeqw (x64_psubusw b a) (xmm_zero $I16X8)))
-
-;; Flip the upper bit of each lane so the signed comparison is the same as
-;; an unsigned one and then invert the result. See docs on `pcmpgt` for why
-;; flipping the upper bit works.
-(rule (lower (icmp (IntCC.UnsignedGreaterThanOrEqual) a @ (value_type (ty_vec128 ty)) b))
-      (let (
-          (mask Xmm (flip_high_bit_mask ty))
-          (a_masked Xmm (x64_pxor a mask))
-          (b_masked Xmm (x64_pxor b mask))
-          (cmp Xmm (x64_pcmpgt ty b_masked a_masked))
-        )
-        (x64_pxor cmp (vector_all_ones))))
 
 ;; SSE `ule`
 
