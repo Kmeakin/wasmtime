@@ -389,8 +389,8 @@ block0(v0: i32):
 ; function %icmp_ugt_umin(i32) -> i8 fast {
 ; block0(v0: i32):
 ;     v1 = iconst.i32 0
-;     v4 = icmp ne v0, v1  ; v1 = 0
-;     return v4
+;     v3 = icmp ugt v0, v1  ; v1 = 0
+;     return v3
 ; }
 
 function %icmp_ugt_umax(i32) -> i8 {
@@ -402,8 +402,9 @@ block0(v0: i32):
 
 ; function %icmp_ugt_umax(i32) -> i8 fast {
 ; block0(v0: i32):
-;     v4 = iconst.i8 0
-;     return v4  ; v4 = 0
+;     v1 = iconst.i32 0xffff_ffff
+;     v3 = icmp ugt v0, v1  ; v1 = 0xffff_ffff
+;     return v3
 ; }
 
 function %icmp_ugt_smin(i32) -> i8 {
@@ -443,8 +444,9 @@ block0(v0: i32):
 
 ; function %icmp_uge_umin(i32) -> i8 fast {
 ; block0(v0: i32):
-;     v4 = iconst.i8 1
-;     return v4  ; v4 = 1
+;     v1 = iconst.i32 0
+;     v3 = icmp uge v0, v1  ; v1 = 0
+;     return v3
 ; }
 
 function %icmp_uge_umax(i32) -> i8 {
@@ -457,8 +459,8 @@ block0(v0: i32):
 ; function %icmp_uge_umax(i32) -> i8 fast {
 ; block0(v0: i32):
 ;     v1 = iconst.i32 0xffff_ffff
-;     v4 = icmp eq v0, v1  ; v1 = 0xffff_ffff
-;     return v4
+;     v3 = icmp uge v0, v1  ; v1 = 0xffff_ffff
+;     return v3
 ; }
 
 function %icmp_uge_smin(i32) -> i8 {
@@ -622,9 +624,9 @@ block0(v0: i32):
 
 ; function %icmp_sgt_umax(i32) -> i8 fast {
 ; block0(v0: i32):
-;     v4 = iconst.i32 0
-;     v5 = icmp sge v0, v4  ; v4 = 0
-;     return v5
+;     v1 = iconst.i32 0xffff_ffff
+;     v3 = icmp sgt v0, v1  ; v1 = 0xffff_ffff
+;     return v3
 ; }
 
 function %icmp_sgt_smin(i32) -> i8 {
@@ -637,8 +639,8 @@ block0(v0: i32):
 ; function %icmp_sgt_smin(i32) -> i8 fast {
 ; block0(v0: i32):
 ;     v1 = iconst.i32 0x8000_0000
-;     v4 = icmp ne v0, v1  ; v1 = 0x8000_0000
-;     return v4
+;     v3 = icmp sgt v0, v1  ; v1 = 0x8000_0000
+;     return v3
 ; }
 
 function %icmp_sgt_smax(i32) -> i8 {
@@ -650,8 +652,9 @@ block0(v0: i32):
 
 ; function %icmp_sgt_smax(i32) -> i8 fast {
 ; block0(v0: i32):
-;     v4 = iconst.i8 0
-;     return v4  ; v4 = 0
+;     v1 = iconst.i32 0x7fff_ffff
+;     v3 = icmp sgt v0, v1  ; v1 = 0x7fff_ffff
+;     return v3
 ; }
 
 function %icmp_sge_umin(i32) -> i8 {
@@ -691,8 +694,9 @@ block0(v0: i32):
 
 ; function %icmp_sge_smin(i32) -> i8 fast {
 ; block0(v0: i32):
-;     v4 = iconst.i8 1
-;     return v4  ; v4 = 1
+;     v1 = iconst.i32 0x8000_0000
+;     v3 = icmp sge v0, v1  ; v1 = 0x8000_0000
+;     return v3
 ; }
 
 function %icmp_sge_smax(i32) -> i8 {
@@ -705,8 +709,8 @@ block0(v0: i32):
 ; function %icmp_sge_smax(i32) -> i8 fast {
 ; block0(v0: i32):
 ;     v1 = iconst.i32 0x7fff_ffff
-;     v4 = icmp eq v0, v1  ; v1 = 0x7fff_ffff
-;     return v4
+;     v3 = icmp sge v0, v1  ; v1 = 0x7fff_ffff
+;     return v3
 ; }
 
 function %icmp_and_eq_eq(i32, i32) -> i8 {

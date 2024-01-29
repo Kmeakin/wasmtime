@@ -23,10 +23,6 @@
     (bmask ty cmp))
 
 ;; Transform select-of-icmp into {u,s}{min,max} instructions where possible.
-(rule (simplify (select ty (sgt _ x y) x y)) (smax ty x y))
-(rule (simplify (select ty (sge _ x y) x y)) (smax ty x y))
-(rule (simplify (select ty (ugt _ x y) x y)) (umax ty x y))
-(rule (simplify (select ty (uge _ x y) x y)) (umax ty x y))
 (rule (simplify (select ty (slt _ x y) x y)) (smin ty x y))
 (rule (simplify (select ty (sle _ x y) x y)) (smin ty x y))
 (rule (simplify (select ty (ult _ x y) x y)) (umin ty x y))
@@ -37,16 +33,8 @@
 (rule (simplify (select ty (sle _ x y) y x)) (smax ty x y))
 (rule (simplify (select ty (ult _ x y) y x)) (umax ty x y))
 (rule (simplify (select ty (ule _ x y) y x)) (umax ty x y))
-(rule (simplify (select ty (sgt _ x y) y x)) (smin ty x y))
-(rule (simplify (select ty (sge _ x y) y x)) (smin ty x y))
-(rule (simplify (select ty (ugt _ x y) y x)) (umin ty x y))
-(rule (simplify (select ty (uge _ x y) y x)) (umin ty x y))
 
 ;; Transform bitselect-of-icmp into {u,s}{min,max} instructions where possible.
-(rule (simplify (bitselect ty @ (multi_lane _ _) (sgt _ x y) x y)) (smax ty x y))
-(rule (simplify (bitselect ty @ (multi_lane _ _) (sge _ x y) x y)) (smax ty x y))
-(rule (simplify (bitselect ty @ (multi_lane _ _) (ugt _ x y) x y)) (umax ty x y))
-(rule (simplify (bitselect ty @ (multi_lane _ _) (uge _ x y) x y)) (umax ty x y))
 (rule (simplify (bitselect ty @ (multi_lane _ _) (slt _ x y) x y)) (smin ty x y))
 (rule (simplify (bitselect ty @ (multi_lane _ _) (sle _ x y) x y)) (smin ty x y))
 (rule (simplify (bitselect ty @ (multi_lane _ _) (ult _ x y) x y)) (umin ty x y))
@@ -57,10 +45,6 @@
 (rule (simplify (bitselect ty @ (multi_lane _ _) (sle _ x y) y x)) (smax ty x y))
 (rule (simplify (bitselect ty @ (multi_lane _ _) (ult _ x y) y x)) (umax ty x y))
 (rule (simplify (bitselect ty @ (multi_lane _ _) (ule _ x y) y x)) (umax ty x y))
-(rule (simplify (bitselect ty @ (multi_lane _ _) (sgt _ x y) y x)) (smin ty x y))
-(rule (simplify (bitselect ty @ (multi_lane _ _) (sge _ x y) y x)) (smin ty x y))
-(rule (simplify (bitselect ty @ (multi_lane _ _) (ugt _ x y) y x)) (umin ty x y))
-(rule (simplify (bitselect ty @ (multi_lane _ _) (uge _ x y) y x)) (umin ty x y))
 
 ;; (c & x) | (~c & y) -> (bitselect c x y)
 ;; These are all the same rule, just with different permutations of the operands
