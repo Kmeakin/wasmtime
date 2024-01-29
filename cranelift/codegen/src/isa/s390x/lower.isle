@@ -273,7 +273,7 @@
       (let ((x_ext Reg (put_in_reg_zext32 x))
             (y_ext Reg (put_in_reg_zext32 y))
             (cond ProducesBool (bool (icmpu_reg (ty_ext32 ty) x_ext y_ext)
-                                     (intcc_as_cond (IntCC.UnsignedGreaterThan)))))
+                                     (Cond.UnsignedGreaterThan))))
         (select_bool_reg ty cond y_ext x_ext)))
 
 ;; Unsigned maximum of two 128-bit integers - expand to icmp + select.
@@ -317,7 +317,7 @@
       (let ((x_ext Reg (put_in_reg_sext32 x))
             (y_ext Reg (put_in_reg_sext32 y))
             (cond ProducesBool (bool (icmps_reg (ty_ext32 ty) x_ext y_ext)
-                                     (intcc_as_cond (IntCC.SignedGreaterThan)))))
+                                     (Cond.SignedGreaterThan))))
         (select_bool_reg ty cond y_ext x_ext)))
 
 ;; Signed maximum of two 128-bit integers - expand to icmp + select.
@@ -3078,13 +3078,13 @@
         (intcc_as_cond (IntCC.SignedLessThan)) tmp val src))
 (rule (atomic_rmw_body ib ty flags (AtomicRmwOp.Smax) tmp val src)
       (atomic_rmw_body_minmax ib ty flags (cmpop_cmps (ty_ext32 ty))
-        (intcc_as_cond (IntCC.SignedGreaterThan)) tmp val src))
+        (Cond.SignedGreaterThan) tmp val src))
 (rule (atomic_rmw_body ib ty flags (AtomicRmwOp.Umin) tmp val src)
       (atomic_rmw_body_minmax ib ty flags (cmpop_cmpu (ty_ext32 ty))
         (intcc_as_cond (IntCC.UnsignedLessThan)) tmp val src))
 (rule (atomic_rmw_body ib ty flags (AtomicRmwOp.Umax) tmp val src)
       (atomic_rmw_body_minmax ib ty flags (cmpop_cmpu (ty_ext32 ty))
-        (intcc_as_cond (IntCC.UnsignedGreaterThan)) tmp val src))
+        (Cond.UnsignedGreaterThan) tmp val src))
 
 ;; Minimum or maximum operation.
 (decl atomic_rmw_body_minmax (VecMInstBuilder Type MemFlags CmpOp Cond
@@ -3395,23 +3395,15 @@
 
 ;; Compare (signed) 128-bit integers for relational inequality.
 ;; Implemented via synthetic instruction using VECG and VCHLGS.
-(rule (icmp_val _ (IntCC.SignedGreaterThan) x @ (value_type (vr128_ty ty)) y)
-      (vec_int128_scmphi x y))
 (rule (icmp_val _ (IntCC.SignedLessThan) x @ (value_type (vr128_ty ty)) y)
       (vec_int128_scmphi y x))
-(rule (icmp_val _ (IntCC.SignedGreaterThanOrEqual) x @ (value_type (vr128_ty ty)) y)
-      (invert_bool (vec_int128_scmphi y x)))
 (rule (icmp_val _ (IntCC.SignedLessThanOrEqual) x @ (value_type (vr128_ty ty)) y)
       (invert_bool (vec_int128_scmphi x y)))
 
 ;; Compare (unsigned) 128-bit integers for relational inequality.
 ;; Implemented via synthetic instruction using VECLG and VCHLGS.
-(rule (icmp_val _ (IntCC.UnsignedGreaterThan) x @ (value_type (vr128_ty ty)) y)
-      (vec_int128_ucmphi x y))
 (rule (icmp_val _ (IntCC.UnsignedLessThan) x @ (value_type (vr128_ty ty)) y)
       (vec_int128_ucmphi y x))
-(rule (icmp_val _ (IntCC.UnsignedGreaterThanOrEqual) x @ (value_type (vr128_ty ty)) y)
-      (invert_bool (vec_int128_ucmphi y x)))
 (rule (icmp_val _ (IntCC.UnsignedLessThanOrEqual) x @ (value_type (vr128_ty ty)) y)
       (invert_bool (vec_int128_ucmphi x y)))
 
@@ -3423,22 +3415,14 @@
       (vec_cmpeq ty x y))
 (rule (lower (has_type (ty_vec128 ty) (icmp (IntCC.NotEqual) x y)))
       (vec_not ty (vec_cmpeq ty x y)))
-(rule (lower (has_type (ty_vec128 ty) (icmp (IntCC.SignedGreaterThan) x y)))
-      (vec_cmph ty x y))
 (rule (lower (has_type (ty_vec128 ty) (icmp (IntCC.SignedLessThanOrEqual) x y)))
       (vec_not ty (vec_cmph ty x y)))
 (rule (lower (has_type (ty_vec128 ty) (icmp (IntCC.SignedLessThan) x y)))
       (vec_cmph ty y x))
-(rule (lower (has_type (ty_vec128 ty) (icmp (IntCC.SignedGreaterThanOrEqual) x y)))
-      (vec_not ty (vec_cmph ty y x)))
-(rule (lower (has_type (ty_vec128 ty) (icmp (IntCC.UnsignedGreaterThan) x y)))
-      (vec_cmphl ty x y))
 (rule (lower (has_type (ty_vec128 ty) (icmp (IntCC.UnsignedLessThanOrEqual) x y)))
       (vec_not ty (vec_cmphl ty x y)))
 (rule (lower (has_type (ty_vec128 ty) (icmp (IntCC.UnsignedLessThan) x y)))
       (vec_cmphl ty y x))
-(rule (lower (has_type (ty_vec128 ty) (icmp (IntCC.UnsignedGreaterThanOrEqual) x y)))
-      (vec_not ty (vec_cmphl ty y x)))
 
 
 ;;;; Rules for `fcmp` ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3507,20 +3491,11 @@
 (rule (vall_true_val (has_type ty (icmp (IntCC.NotEqual) x y)))
       (bool (vec_cmpeqs ty x y)
             (floatcc_as_cond (FloatCC.Unordered))))
-(rule (vall_true_val (has_type ty (icmp (IntCC.SignedGreaterThan) x y)))
-      (bool (vec_cmphs ty x y)
-            (floatcc_as_cond (FloatCC.Equal))))
 (rule (vall_true_val (has_type ty (icmp (IntCC.SignedLessThanOrEqual) x y)))
       (bool (vec_cmphs ty x y)
             (floatcc_as_cond (FloatCC.Unordered))))
 (rule (vall_true_val (has_type ty (icmp (IntCC.SignedLessThan) x y)))
       (bool (vec_cmphs ty y x)
-            (floatcc_as_cond (FloatCC.Equal))))
-(rule (vall_true_val (has_type ty (icmp (IntCC.SignedGreaterThanOrEqual) x y)))
-      (bool (vec_cmphs ty y x)
-            (floatcc_as_cond (FloatCC.Unordered))))
-(rule (vall_true_val (has_type ty (icmp (IntCC.UnsignedGreaterThan) x y)))
-      (bool (vec_cmphls ty x y)
             (floatcc_as_cond (FloatCC.Equal))))
 (rule (vall_true_val (has_type ty (icmp (IntCC.UnsignedLessThanOrEqual) x y)))
       (bool (vec_cmphls ty x y)
@@ -3528,9 +3503,6 @@
 (rule (vall_true_val (has_type ty (icmp (IntCC.UnsignedLessThan) x y)))
       (bool (vec_cmphls ty y x)
             (floatcc_as_cond (FloatCC.Equal))))
-(rule (vall_true_val (has_type ty (icmp (IntCC.UnsignedGreaterThanOrEqual) x y)))
-      (bool (vec_cmphls ty y x)
-            (floatcc_as_cond (FloatCC.Unordered))))
 
 ;; Short-circuit `vall_true` on the result of a `fcmp` where possible.
 (rule (vall_true_val (has_type ty (fcmp (FloatCC.Equal) x y)))
@@ -3585,20 +3557,11 @@
 (rule (vany_true_val (has_type ty (icmp (IntCC.NotEqual) x y)))
       (bool (vec_cmpeqs ty x y)
             (floatcc_as_cond (FloatCC.NotEqual))))
-(rule (vany_true_val (has_type ty (icmp (IntCC.SignedGreaterThan) x y)))
-      (bool (vec_cmphs ty x y)
-            (floatcc_as_cond (FloatCC.Ordered))))
 (rule (vany_true_val (has_type ty (icmp (IntCC.SignedLessThanOrEqual) x y)))
       (bool (vec_cmphs ty x y)
             (floatcc_as_cond (FloatCC.NotEqual))))
 (rule (vany_true_val (has_type ty (icmp (IntCC.SignedLessThan) x y)))
       (bool (vec_cmphs ty y x)
-            (floatcc_as_cond (FloatCC.Ordered))))
-(rule (vany_true_val (has_type ty (icmp (IntCC.SignedGreaterThanOrEqual) x y)))
-      (bool (vec_cmphs ty y x)
-            (floatcc_as_cond (FloatCC.NotEqual))))
-(rule (vany_true_val (has_type ty (icmp (IntCC.UnsignedGreaterThan) x y)))
-      (bool (vec_cmphls ty x y)
             (floatcc_as_cond (FloatCC.Ordered))))
 (rule (vany_true_val (has_type ty (icmp (IntCC.UnsignedLessThanOrEqual) x y)))
       (bool (vec_cmphls ty x y)
@@ -3606,9 +3569,6 @@
 (rule (vany_true_val (has_type ty (icmp (IntCC.UnsignedLessThan) x y)))
       (bool (vec_cmphls ty y x)
             (floatcc_as_cond (FloatCC.Ordered))))
-(rule (vany_true_val (has_type ty (icmp (IntCC.UnsignedGreaterThanOrEqual) x y)))
-      (bool (vec_cmphls ty y x)
-            (floatcc_as_cond (FloatCC.NotEqual))))
 
 ;; Short-circuit `vany_true` on the result of a `fcmp` where possible.
 (rule (vany_true_val (has_type ty (fcmp (FloatCC.Equal) x y)))
@@ -3766,7 +3726,7 @@
             ;; in the final JTSequence, which is the block terminator.
             (cond ProducesBool
               (bool (icmpu_uimm32 $I64 idx (jump_table_size targets))
-                    (intcc_as_cond (IntCC.UnsignedGreaterThanOrEqual))))
+                    (Cond.UnsignedGreaterThanOrEqual)))
             (_ Unit (emit_side_effect (oneway_cond_br_bool cond default))))
         ;; Scale the index by the element size, and then emit the
         ;; compound instruction that does:
@@ -3842,7 +3802,7 @@
 ;;
 ;; As this does not match any of the encodings used with a normal integer
 ;; comparsion, this cannot be represented by any IntCC value.  We need to
-;; remap the IntCC::UnsignedGreaterThan value that we have here as result
+;; remap the Cond::UnsignedGreaterThan value that we have here as result
 ;; of the unsigned_add_overflow_condition call to the correct mask.
 
 (rule 0 (lower (has_type (fits_in_64 ty) (uadd_overflow_trap x y tc)))

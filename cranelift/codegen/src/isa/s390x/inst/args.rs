@@ -160,6 +160,20 @@ pub struct Cond {
     mask: u8,
 }
 
+#[allow(non_upper_case_globals)]
+impl Cond {
+    pub const Equal: Self = Self { mask: 8 };
+    pub const NotEqual: Self = Self { mask: 4 | 2 };
+    pub const SignedGreaterThanOrEqual: Self = Self { mask: 8 | 2 };
+    pub const SignedGreaterThan: Self = Self { mask: 2 };
+    pub const SignedLessThanOrEqual: Self = Self { mask: 8 | 4 };
+    pub const SignedLessThan: Self = Self { mask: 4 };
+    pub const UnsignedGreaterThanOrEqual: Self = Self { mask: 8 | 2 };
+    pub const UnsignedGreaterThan: Self = Self { mask: 2 };
+    pub const UnsignedLessThanOrEqual: Self = Self { mask: 8 | 4 };
+    pub const UnsignedLessThan: Self = Self { mask: 4 };
+}
+
 impl Cond {
     pub fn from_mask(mask: u8) -> Cond {
         assert!(mask >= 1 && mask <= 14);
@@ -167,19 +181,18 @@ impl Cond {
     }
 
     pub fn from_intcc(cc: IntCC) -> Cond {
-        let mask = match cc {
-            IntCC::Equal => 8,
-            IntCC::NotEqual => 4 | 2,
-            IntCC::SignedGreaterThanOrEqual => 8 | 2,
-            IntCC::SignedGreaterThan => 2,
-            IntCC::SignedLessThanOrEqual => 8 | 4,
-            IntCC::SignedLessThan => 4,
-            IntCC::UnsignedGreaterThanOrEqual => 8 | 2,
-            IntCC::UnsignedGreaterThan => 2,
-            IntCC::UnsignedLessThanOrEqual => 8 | 4,
-            IntCC::UnsignedLessThan => 4,
-        };
-        Cond { mask }
+        match cc {
+            IntCC::Equal => Self::Equal,
+            IntCC::NotEqual => Self::NotEqual,
+            IntCC::SignedGreaterThanOrEqual => Self::SignedGreaterThanOrEqual,
+            IntCC::SignedGreaterThan => Self::SignedGreaterThan,
+            IntCC::SignedLessThanOrEqual => Self::SignedLessThanOrEqual,
+            IntCC::SignedLessThan => Self::SignedLessThan,
+            IntCC::UnsignedGreaterThanOrEqual => Self::UnsignedGreaterThanOrEqual,
+            IntCC::UnsignedGreaterThan => Self::UnsignedGreaterThan,
+            IntCC::UnsignedLessThanOrEqual => Self::UnsignedLessThanOrEqual,
+            IntCC::UnsignedLessThan => Self::UnsignedLessThan,
+        }
     }
 
     pub fn from_floatcc(cc: FloatCC) -> Cond {

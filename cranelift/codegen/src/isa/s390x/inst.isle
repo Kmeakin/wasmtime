@@ -1712,7 +1712,17 @@
 
 ;; Helpers for condition codes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(type Cond extern (enum))
+(type Cond extern (enum
+    (Equal)
+    (NotEqual)
+    (SignedGreaterThanOrEqual)
+    (SignedGreaterThan)
+    (SignedLessThanOrEqual)
+    (SignedLessThan)
+    (UnsignedGreaterThanOrEqual)
+    (UnsignedGreaterThan)
+    (UnsignedLessThanOrEqual)
+    (UnsignedLessThan)))
 
 (decl mask_as_cond (u8) Cond)
 (extern constructor mask_as_cond mask_as_cond)
@@ -3805,10 +3815,10 @@
 (rule 1 (uint_sat_reg ty ty reg) reg)
 (rule (uint_sat_reg $I8 (ty_32_or_64 ty) reg)
       (with_flags_reg (icmpu_uimm32 ty reg 256)
-        (cmov_imm ty (intcc_as_cond (IntCC.UnsignedGreaterThan)) 255 reg)))
+        (cmov_imm ty (Cond.UnsignedGreaterThan) 255 reg)))
 (rule (uint_sat_reg $I16 (ty_32_or_64 ty) reg)
       (with_flags_reg (icmpu_uimm32 ty reg 65535)
-        (cmov_imm ty (intcc_as_cond (IntCC.UnsignedGreaterThan)) -1 reg)))
+        (cmov_imm ty (Cond.UnsignedGreaterThan) -1 reg)))
 (rule (uint_sat_reg $I32 $I64 reg)
       (let ((bound Reg (imm $I64 4294967295))
             (cond ProducesBool
@@ -3821,13 +3831,13 @@
 (rule (sint_sat_reg $I8 (ty_32_or_64 ty) reg)
       (let ((ub Reg (with_flags_reg (icmps_simm16 ty reg 127)
                       (cmov_imm ty
-                        (intcc_as_cond (IntCC.SignedGreaterThan)) 127 reg))))
+                        (Cond.SignedGreaterThan) 127 reg))))
         (with_flags_reg (icmps_simm16 ty ub -128)
           (cmov_imm ty (intcc_as_cond (IntCC.SignedLessThan)) -128 ub))))
 (rule (sint_sat_reg $I16 (ty_32_or_64 ty) reg)
       (let ((ub Reg (with_flags_reg (icmps_simm16 ty reg 32767)
                       (cmov_imm ty
-                        (intcc_as_cond (IntCC.SignedGreaterThan)) 32767 reg))))
+                        (Cond.SignedGreaterThan) 32767 reg))))
         (with_flags_reg (icmps_simm16 ty ub -32768)
           (cmov_imm ty (intcc_as_cond (IntCC.SignedLessThan)) -32768 ub))))
 (rule (sint_sat_reg $I32 $I64 reg)
@@ -3839,7 +3849,7 @@
             (l_bound Reg (imm32 $I64 -2147483648))
             (l_cond ProducesBool
               (bool (icmps_reg $I64 ub l_bound)
-                    (intcc_as_cond (IntCC.SignedLessThan)))))
+                    (Cond.SignedLessThan))))
         (select_bool_reg $I64 l_cond l_bound ub)))
 
 
