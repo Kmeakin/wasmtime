@@ -144,7 +144,7 @@ impl Switch {
 
                 let first_index = right[0].first_index;
                 let should_take_right_side =
-                    icmp_imm_u128(bx, IntCC::UnsignedGreaterThanOrEqual, val, first_index);
+                    ircmp_imm_u128(bx, IntCC::UnsignedLessThanOrEqual, val, first_index);
                 bx.ins()
                     .brif(should_take_right_side, right_block, &[], left_block, &[]);
 
@@ -184,12 +184,8 @@ impl Switch {
                     let is_good_val = icmp_imm_u128(bx, IntCC::Equal, val, range.first_index);
                     bx.ins().brif(is_good_val, block, &[], alternate, &[]);
                 } else {
-                    let is_good_val = icmp_imm_u128(
-                        bx,
-                        IntCC::UnsignedGreaterThanOrEqual,
-                        val,
-                        range.first_index,
-                    );
+                    let is_good_val =
+                        ircmp_imm_u128(bx, IntCC::UnsignedLessThanOrEqual, val, range.first_index);
                     let jt_block = bx.create_block();
                     bx.ins().brif(is_good_val, jt_block, &[], alternate, &[]);
                     bx.seal_block(jt_block);
@@ -248,7 +244,7 @@ impl Switch {
                 let new_block = bx.create_block();
                 let bigger_than_u32 =
                     bx.ins()
-                        .icmp_imm(IntCC::UnsignedGreaterThan, discr, u32::MAX as i64);
+                        .ircmp_imm(IntCC::UnsignedLessThan, discr, u32::MAX as i64);
                 bx.ins()
                     .brif(bigger_than_u32, otherwise, &[], new_block, &[]);
                 bx.seal_block(new_block);
@@ -300,6 +296,18 @@ fn icmp_imm_u128(bx: &mut FunctionBuilder, cond: IntCC, x: Value, y: u128) -> Va
         let msb = bx.ins().iconst(types::I64, msb as i64);
         let index = bx.ins().iconcat(lsb, msb);
         bx.ins().icmp(cond, x, index)
+    }
+}
+
+fn ircmp_imm_u128(bx: &mut FunctionBuilder, cond: IntCC, x: Value, y: u128) -> Value {
+    if let Ok(index) = u64::try_from(y) {
+        bx.ins().ircmp_imm(cond, x, index as i64)
+    } else {
+        let (lsb, msb) = (y as u64, (y >> 64) as u64);
+        let lsb = bx.ins().iconst(types::I64, lsb as i64);
+        let msb = bx.ins().iconst(types::I64, msb as i64);
+        let index = bx.ins().iconcat(lsb, msb);
+        bx.ins().icmp(cond, index, x)
     }
 }
 
