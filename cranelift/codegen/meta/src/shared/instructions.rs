@@ -764,44 +764,6 @@ pub(crate) fn define(
 
     ig.push(
         Inst::new(
-            "uload8",
-            r#"
-        Load 8 bits from memory at ``p + Offset`` and zero-extend.
-
-        This is equivalent to ``load.i8`` followed by ``uextend``.
-        "#,
-            &formats.load,
-        )
-        .operands_in(vec![
-            Operand::new("MemFlags", &imm.memflags),
-            Operand::new("p", iAddr),
-            Operand::new("Offset", &imm.offset32).with_doc("Byte offset from base address"),
-        ])
-        .operands_out(vec![Operand::new("a", iExt8)])
-        .can_load(),
-    );
-
-    ig.push(
-        Inst::new(
-            "sload8",
-            r#"
-        Load 8 bits from memory at ``p + Offset`` and sign-extend.
-
-        This is equivalent to ``load.i8`` followed by ``sextend``.
-        "#,
-            &formats.load,
-        )
-        .operands_in(vec![
-            Operand::new("MemFlags", &imm.memflags),
-            Operand::new("p", iAddr),
-            Operand::new("Offset", &imm.offset32).with_doc("Byte offset from base address"),
-        ])
-        .operands_out(vec![Operand::new("a", iExt8)])
-        .can_load(),
-    );
-
-    ig.push(
-        Inst::new(
             "istore8",
             r#"
         Store the low 8 bits of ``x`` to memory at ``p + Offset``.
@@ -827,44 +789,6 @@ pub(crate) fn define(
 
     ig.push(
         Inst::new(
-            "uload16",
-            r#"
-        Load 16 bits from memory at ``p + Offset`` and zero-extend.
-
-        This is equivalent to ``load.i16`` followed by ``uextend``.
-        "#,
-            &formats.load,
-        )
-        .operands_in(vec![
-            Operand::new("MemFlags", &imm.memflags),
-            Operand::new("p", iAddr),
-            Operand::new("Offset", &imm.offset32).with_doc("Byte offset from base address"),
-        ])
-        .operands_out(vec![Operand::new("a", iExt16)])
-        .can_load(),
-    );
-
-    ig.push(
-        Inst::new(
-            "sload16",
-            r#"
-        Load 16 bits from memory at ``p + Offset`` and sign-extend.
-
-        This is equivalent to ``load.i16`` followed by ``sextend``.
-        "#,
-            &formats.load,
-        )
-        .operands_in(vec![
-            Operand::new("MemFlags", &imm.memflags),
-            Operand::new("p", iAddr),
-            Operand::new("Offset", &imm.offset32).with_doc("Byte offset from base address"),
-        ])
-        .operands_out(vec![Operand::new("a", iExt16)])
-        .can_load(),
-    );
-
-    ig.push(
-        Inst::new(
             "istore16",
             r#"
         Store the low 16 bits of ``x`` to memory at ``p + Offset``.
@@ -886,44 +810,6 @@ pub(crate) fn define(
         "iExt32",
         "An integer type with more than 32 bits",
         TypeSetBuilder::new().ints(64..64).build(),
-    );
-
-    ig.push(
-        Inst::new(
-            "uload32",
-            r#"
-        Load 32 bits from memory at ``p + Offset`` and zero-extend.
-
-        This is equivalent to ``load.i32`` followed by ``uextend``.
-        "#,
-            &formats.load,
-        )
-        .operands_in(vec![
-            Operand::new("MemFlags", &imm.memflags),
-            Operand::new("p", iAddr),
-            Operand::new("Offset", &imm.offset32).with_doc("Byte offset from base address"),
-        ])
-        .operands_out(vec![Operand::new("a", iExt32)])
-        .can_load(),
-    );
-
-    ig.push(
-        Inst::new(
-            "sload32",
-            r#"
-        Load 32 bits from memory at ``p + Offset`` and sign-extend.
-
-        This is equivalent to ``load.i32`` followed by ``sextend``.
-        "#,
-            &formats.load,
-        )
-        .operands_in(vec![
-            Operand::new("MemFlags", &imm.memflags),
-            Operand::new("p", iAddr),
-            Operand::new("Offset", &imm.offset32).with_doc("Byte offset from base address"),
-        ])
-        .operands_out(vec![Operand::new("a", iExt32)])
-        .can_load(),
     );
 
     ig.push(

@@ -28,15 +28,17 @@ block0(v0: i64):
 
 function %uload8_i16(i64) -> i16 {
 block0(v0: i64):
-  v1 = uload8.i16 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = uextend.i16 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movzbq  0(%rdi), %rax
+;   movzbq  0(%rdi), %rcx
+;   movzbl  %cl, %eax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -46,22 +48,25 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movzbq (%rdi), %rax ; trap: heap_oob
+;   movzbq (%rdi), %rcx ; trap: heap_oob
+;   movzbl %cl, %eax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
 
 function %uload8_i32(i64) -> i32 {
 block0(v0: i64):
-  v1 = uload8.i32 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = uextend.i32 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movzbq  0(%rdi), %rax
+;   movzbq  0(%rdi), %rcx
+;   movzbl  %cl, %eax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -71,22 +76,25 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movzbq (%rdi), %rax ; trap: heap_oob
+;   movzbq (%rdi), %rcx ; trap: heap_oob
+;   movzbl %cl, %eax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
 
 function %uload8_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = uload8.i64 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = uextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movzbq  0(%rdi), %rax
+;   movzbq  0(%rdi), %rcx
+;   movzbq  %cl, %rax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -96,22 +104,25 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movzbq (%rdi), %rax ; trap: heap_oob
+;   movzbq (%rdi), %rcx ; trap: heap_oob
+;   movzbq %cl, %rax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
 
 function %sload8_i16(i64) -> i16 {
 block0(v0: i64):
-  v1 = sload8.i16 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = sextend.i16 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movsbq  0(%rdi), %rax
+;   movzbq  0(%rdi), %rcx
+;   movsbl  %cl, %eax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -121,22 +132,25 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movsbq (%rdi), %rax ; trap: heap_oob
+;   movzbq (%rdi), %rcx ; trap: heap_oob
+;   movsbl %cl, %eax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
 
 function %sload8_i32(i64) -> i32 {
 block0(v0: i64):
-  v1 = sload8.i32 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = sextend.i32 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movsbq  0(%rdi), %rax
+;   movzbq  0(%rdi), %rcx
+;   movsbl  %cl, %eax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -146,22 +160,25 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movsbq (%rdi), %rax ; trap: heap_oob
+;   movzbq (%rdi), %rcx ; trap: heap_oob
+;   movsbl %cl, %eax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
 
 function %sload8_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = sload8.i64 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = sextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movsbq  0(%rdi), %rax
+;   movzbq  0(%rdi), %rcx
+;   movsbq  %cl, %rax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -171,7 +188,8 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movsbq (%rdi), %rax ; trap: heap_oob
+;   movzbq (%rdi), %rcx ; trap: heap_oob
+;   movsbq %cl, %rax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
@@ -203,15 +221,17 @@ block0(v0: i64):
 
 function %uload16_i32(i64) -> i32 {
 block0(v0: i64):
-  v1 = uload16.i32 v0
-  return v1
+  v1 = load.i16 v0
+  v2 = uextend.i32 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movzwq  0(%rdi), %rax
+;   movzwq  0(%rdi), %rcx
+;   movzwl  %cx, %eax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -221,22 +241,25 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movzwq (%rdi), %rax ; trap: heap_oob
+;   movzwq (%rdi), %rcx ; trap: heap_oob
+;   movzwl %cx, %eax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
 
 function %uload16_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = uload16.i64 v0
-  return v1
+  v1 = load.i16 v0
+  v2 = uextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movzwq  0(%rdi), %rax
+;   movzwq  0(%rdi), %rcx
+;   movzwq  %cx, %rax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -246,22 +269,25 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movzwq (%rdi), %rax ; trap: heap_oob
+;   movzwq (%rdi), %rcx ; trap: heap_oob
+;   movzwq %cx, %rax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
 
 function %sload16_i32(i64) -> i32 {
 block0(v0: i64):
-  v1 = sload16.i32 v0
-  return v1
+  v1 = load.i16 v0
+  v2 = sextend.i32 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movswq  0(%rdi), %rax
+;   movzwq  0(%rdi), %rcx
+;   movswl  %cx, %eax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -271,22 +297,25 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movswq (%rdi), %rax ; trap: heap_oob
+;   movzwq (%rdi), %rcx ; trap: heap_oob
+;   movswl %cx, %eax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
 
 function %sload16_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = sload16.i64 v0
-  return v1
+  v1 = load.i16 v0
+  v2 = sextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ;   pushq   %rbp
 ;   movq    %rsp, %rbp
 ; block0:
-;   movswq  0(%rdi), %rax
+;   movzwq  0(%rdi), %rcx
+;   movswq  %cx, %rax
 ;   movq    %rbp, %rsp
 ;   popq    %rbp
 ;   ret
@@ -296,7 +325,8 @@ block0(v0: i64):
 ;   pushq %rbp
 ;   movq %rsp, %rbp
 ; block1: ; offset 0x4
-;   movswq (%rdi), %rax ; trap: heap_oob
+;   movzwq (%rdi), %rcx ; trap: heap_oob
+;   movswq %cx, %rax
 ;   movq %rbp, %rsp
 ;   popq %rbp
 ;   retq
@@ -328,8 +358,9 @@ block0(v0: i64):
 
 function %uload32_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = uload32.i64 v0
-  return v1
+  v1 = load.i32 v0
+  v2 = uextend.i64 v1
+  return v2
 }
 
 ; VCode:
@@ -353,8 +384,9 @@ block0(v0: i64):
 
 function %sload32_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = sload32.i64 v0
-  return v1
+  v1 = load.i32 v0
+  v2 = sextend.i64 v1
+  return v2
 }
 
 ; VCode:

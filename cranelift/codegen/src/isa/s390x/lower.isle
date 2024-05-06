@@ -95,16 +95,6 @@
 (rule 11 (lower (has_type (fits_in_64 ty) (iadd (sinkable_load_16 x) y)))
       (add_mem_sext16 ty y (sink_load x)))
 
-;; Add a register and sign-extended memory.
-(rule 3 (lower (has_type (fits_in_64 ty) (iadd x (sinkable_sload16 y))))
-      (add_mem_sext16 ty x (sink_sload16 y)))
-(rule 10 (lower (has_type (fits_in_64 ty) (iadd (sinkable_sload16 x) y)))
-      (add_mem_sext16 ty y (sink_sload16 x)))
-(rule 2 (lower (has_type (fits_in_64 ty) (iadd x (sinkable_sload32 y))))
-      (add_mem_sext32 ty x (sink_sload32 y)))
-(rule 9 (lower (has_type (fits_in_64 ty) (iadd (sinkable_sload32 x) y)))
-      (add_mem_sext32 ty y (sink_sload32 x)))
-
 ;; Add two vector registers.
 (rule 1 (lower (has_type (vr128_ty ty) (iadd x y)))
       (vec_add ty x y))
@@ -170,12 +160,6 @@
 ;; Sub a register and memory (16-bit types).
 (rule 4 (lower (has_type (fits_in_64 ty) (isub x (sinkable_load_16 y))))
       (sub_mem_sext16 ty x (sink_load y)))
-
-;; Sub a register and sign-extended memory.
-(rule 3 (lower (has_type (fits_in_64 ty) (isub x (sinkable_sload16 y))))
-      (sub_mem_sext16 ty x (sink_sload16 y)))
-(rule 2 (lower (has_type (fits_in_64 ty) (isub x (sinkable_sload32 y))))
-      (sub_mem_sext32 ty x (sink_sload32 y)))
 
 ;; Sub two vector registers.
 (rule 1 (lower (has_type (vr128_ty ty) (isub x y)))
@@ -372,16 +356,6 @@
       (mul_mem_sext16 ty x (sink_load y)))
 (rule 11 (lower (has_type (fits_in_64 ty) (imul (sinkable_load_16 x) y)))
       (mul_mem_sext16 ty y (sink_load x)))
-
-;; Multiply a register and sign-extended memory.
-(rule 3 (lower (has_type (fits_in_64 ty) (imul x (sinkable_sload16 y))))
-      (mul_mem_sext16 ty x (sink_sload16 y)))
-(rule 10 (lower (has_type (fits_in_64 ty) (imul (sinkable_sload16 x) y)))
-      (mul_mem_sext16 ty y (sink_sload16 x)))
-(rule 2 (lower (has_type (fits_in_64 ty) (imul x (sinkable_sload32 y))))
-      (mul_mem_sext32 ty x (sink_sload32 y)))
-(rule 9 (lower (has_type (fits_in_64 ty) (imul (sinkable_sload32 x) y)))
-      (mul_mem_sext32 ty y (sink_sload32 x)))
 
 ;; Multiply two vector registers, using a helper.
 (decl vec_mul_impl (Type Reg Reg) Reg)
@@ -2458,106 +2432,6 @@
       (vec_elt_rev ty (vec_load ty (lower_address flags addr offset))))
 
 
-;;;; Rules for `uload8` ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; 16- or 32-bit target types.
-(rule (lower (has_type (gpr32_ty _ty) (uload8 flags addr offset)))
-      (zext32_mem $I8 (lower_address flags addr offset)))
-
-;; 64-bit target types.
-(rule 1 (lower (has_type (gpr64_ty _ty) (uload8 flags addr offset)))
-      (zext64_mem $I8 (lower_address flags addr offset)))
-
-
-;;;; Rules for `sload8` ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; 16- or 32-bit target types.
-(rule (lower (has_type (gpr32_ty _ty) (sload8 flags addr offset)))
-      (sext32_mem $I8 (lower_address flags addr offset)))
-
-;; 64-bit target types.
-(rule 1 (lower (has_type (gpr64_ty _ty) (sload8 flags addr offset)))
-      (sext64_mem $I8 (lower_address flags addr offset)))
-
-
-;;;; Rules for `uload16` ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; 32-bit target type, big-endian source value.
-(rule 3 (lower (has_type (gpr32_ty _ty)
-                       (uload16 flags @ (bigendian) addr offset)))
-      (zext32_mem $I16 (lower_address flags addr offset)))
-
-;; 32-bit target type, little-endian source value (via explicit extension).
-(rule 1 (lower (has_type (gpr32_ty _ty)
-                       (uload16 flags @ (littleendian) addr offset)))
-      (let ((reg16 Reg (loadrev16 (lower_address flags addr offset))))
-        (zext32_reg $I16 reg16)))
-
-;; 64-bit target type, big-endian source value.
-(rule 4 (lower (has_type (gpr64_ty _ty)
-                       (uload16 flags @ (bigendian) addr offset)))
-      (zext64_mem $I16 (lower_address flags addr offset)))
-
-;; 64-bit target type, little-endian source value (via explicit extension).
-(rule 2 (lower (has_type (gpr64_ty _ty)
-                       (uload16 flags @ (littleendian) addr offset)))
-      (let ((reg16 Reg (loadrev16 (lower_address flags addr offset))))
-        (zext64_reg $I16 reg16)))
-
-
-;;;; Rules for `sload16` ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; 32-bit target type, big-endian source value.
-(rule 2 (lower (has_type (gpr32_ty _ty)
-                       (sload16 flags @ (bigendian) addr offset)))
-      (sext32_mem $I16 (lower_address flags addr offset)))
-
-;; 32-bit target type, little-endian source value (via explicit extension).
-(rule 0 (lower (has_type (gpr32_ty _ty)
-                       (sload16 flags @ (littleendian) addr offset)))
-      (let ((reg16 Reg (loadrev16 (lower_address flags addr offset))))
-        (sext32_reg $I16 reg16)))
-
-;; 64-bit target type, big-endian source value.
-(rule 3 (lower (has_type (gpr64_ty _ty)
-                       (sload16 flags @ (bigendian) addr offset)))
-      (sext64_mem $I16 (lower_address flags addr offset)))
-
-;; 64-bit target type, little-endian source value (via explicit extension).
-(rule 1 (lower (has_type (gpr64_ty _ty)
-                       (sload16 flags @ (littleendian) addr offset)))
-      (let ((reg16 Reg (loadrev16 (lower_address flags addr offset))))
-        (sext64_reg $I16 reg16)))
-
-
-;;;; Rules for `uload32` ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; 64-bit target type, big-endian source value.
-(rule 1 (lower (has_type (gpr64_ty _ty)
-                       (uload32 flags @ (bigendian) addr offset)))
-      (zext64_mem $I32 (lower_address flags addr offset)))
-
-;; 64-bit target type, little-endian source value (via explicit extension).
-(rule (lower (has_type (gpr64_ty _ty)
-                       (uload32 flags @ (littleendian) addr offset)))
-      (let ((reg32 Reg (loadrev32 (lower_address flags addr offset))))
-        (zext64_reg $I32 reg32)))
-
-
-;;;; Rules for `sload32` ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; 64-bit target type, big-endian source value.
-(rule 1 (lower (has_type (gpr64_ty _ty)
-                       (sload32 flags @ (bigendian) addr offset)))
-      (sext64_mem $I32 (lower_address flags addr offset)))
-
-;; 64-bit target type, little-endian source value (via explicit extension).
-(rule (lower (has_type (gpr64_ty _ty)
-                       (sload32 flags @ (littleendian) addr offset)))
-      (let ((reg32 Reg (loadrev32 (lower_address flags addr offset))))
-        (sext64_reg $I32 reg32)))
-
-
 ;;;; Rules for `uloadNxM` and `sloadNxM` ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Unsigned 8->16 bit extension.
@@ -3339,13 +3213,6 @@
 (rule 5 (icmps_val $true x @ (value_type (fits_in_64 ty)) (sinkable_load_16 y))
       (icmps_mem_sext16 (ty_ext32 ty) (put_in_reg_sext32 x) (sink_load y)))
 
-;; Compare (signed) a register and sign-extended memory.
-(rule 4 (icmps_val $true x @ (value_type (fits_in_64 ty)) (sinkable_sload16 y))
-      (icmps_mem_sext16 ty x (sink_sload16 y)))
-(rule 4 (icmps_val $true x @ (value_type (fits_in_64 ty)) (sinkable_sload32 y))
-      (icmps_mem_sext32 ty x (sink_sload32 y)))
-
-
 ;; Return a `ProducesBool` to implement unsigned integer comparisons.
 (decl icmpu_val (bool Value Value) ProducesFlags)
 
@@ -3372,17 +3239,6 @@
                  (sinkable_load_16 ld))
       (if-let y (load_sym ld))
       (icmpu_mem_zext16 (ty_ext32 ty) (put_in_reg_zext32 x) (sink_load y)))
-
-;; Compare (unsigned) a register and zero-extended memory.
-;; Note that the ISA only provides instructions with a PC-relative memory
-;; address here, so we need to check whether the sinkable load matches this.
-(rule 3 (icmpu_val $true x @ (value_type (fits_in_64 ty))
-                 (sinkable_uload16 ld))
-      (if-let y (uload16_sym ld))
-      (icmpu_mem_zext16 ty x (sink_uload16 y)))
-(rule 3 (icmpu_val $true x @ (value_type (fits_in_64 ty)) (sinkable_uload32 y))
-      (icmpu_mem_zext32 ty x (sink_uload32 y)))
-
 
 ;; Compare 128-bit integers for equality.
 ;; Implemented via element-wise comparison using the all-element true CC flag.
@@ -3884,18 +3740,6 @@
                          (uadd_overflow_trap (sinkable_load_32_64 x) y tc)))
       (with_flags
         (add_logical_mem_with_flags_paired ty y (sink_load x))
-        (trap_if_impl (mask_as_cond 3) tc)))
-
-;; Add a register and zero-extended memory.
-(rule 1 (lower (has_type (fits_in_64 ty)
-                         (uadd_overflow_trap x (sinkable_uload32 y) tc)))
-      (with_flags
-        (add_logical_mem_zext32_with_flags_paired ty x (sink_uload32 y))
-        (trap_if_impl (mask_as_cond 3) tc)))
-(rule 5 (lower (has_type (fits_in_64 ty)
-                         (uadd_overflow_trap (sinkable_uload32 x) y tc)))
-      (with_flags
-        (add_logical_mem_zext32_with_flags_paired ty y (sink_uload32 x))
         (trap_if_impl (mask_as_cond 3) tc)))
 
 ;;;; Rules for `return` ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

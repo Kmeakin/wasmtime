@@ -1830,15 +1830,6 @@
       (if (memarg_symbol_offset_sum sym_offset load_offset))
       inst)
 
-(decl pure partial uload16_sym (Inst) Inst)
-(rule (uload16_sym inst)
-      (if-let (uload16 _ (symbol_value (symbol_value_data _ (reloc_distance_near) sym_offset))
-                       (i64_from_offset load_offset))
-          inst)
-      (if (memarg_symbol_offset_sum sym_offset load_offset))
-      inst)
-
-
 ;; Accessors for `MemArgPair`.
 
 (type MemArgPair extern (enum))
@@ -1904,61 +1895,12 @@
 (extractor (sinkable_load_little inst)
            (sinkable_inst (and inst (load (littleendian) _addr _offset))))
 
-;; Sinkable big-endian sload16 instruction.
-(decl sinkable_sload16 (Inst) Value)
-(extractor (sinkable_sload16 inst)
-           (sinkable_inst (and inst (sload16 (bigendian) _addr _offset))))
-
-;; Sinkable big-endian sload32 instruction.
-(decl sinkable_sload32 (Inst) Value)
-(extractor (sinkable_sload32 inst)
-           (sinkable_inst (and inst (sload32 (bigendian) _addr _offset))))
-
-;; Sinkable big-endian uload16 instruction.
-(decl sinkable_uload16 (Inst) Value)
-(extractor (sinkable_uload16 inst)
-           (sinkable_inst (and inst (uload16 (bigendian) _addr _offset))))
-
-;; Sinkable big-endian uload32 instruction.
-(decl sinkable_uload32 (Inst) Value)
-(extractor (sinkable_uload32 inst)
-           (sinkable_inst (and inst (uload32 (bigendian) _addr _offset))))
-
 ;; Sink a load instruction, returning its address as `MemArg`.
 ;; This is a side-effectful operation, see `sink_inst`.
 (decl sink_load (Inst) MemArg)
 (rule (sink_load inst @ (load flags addr offset))
       (let ((_ Unit (sink_inst inst)))
         (lower_address flags addr offset)))
-
-;; Sink a sload16 instruction, returning its address as `MemArg`.
-;; This is a side-effectful operation, see `sink_inst`.
-(decl sink_sload16 (Inst) MemArg)
-(rule (sink_sload16 inst @ (sload16 flags addr offset))
-      (let ((_ Unit (sink_inst inst)))
-        (lower_address flags addr offset)))
-
-;; Sink a sload32 instruction, returning its address as `MemArg`.
-;; This is a side-effectful operation, see `sink_inst`.
-(decl sink_sload32 (Inst) MemArg)
-(rule (sink_sload32 inst @ (sload32 flags addr offset))
-      (let ((_ Unit (sink_inst inst)))
-        (lower_address flags addr offset)))
-
-;; Sink a uload16 instruction, returning its address as `MemArg`.
-;; This is a side-effectful operation, see `sink_inst`.
-(decl sink_uload16 (Inst) MemArg)
-(rule (sink_uload16 inst @ (uload16 flags addr offset))
-      (let ((_ Unit (sink_inst inst)))
-        (lower_address flags addr offset)))
-
-;; Sink a uload32 instruction, returning its address as `MemArg`.
-;; This is a side-effectful operation, see `sink_inst`.
-(decl sink_uload32 (Inst) MemArg)
-(rule (sink_uload32 inst @ (uload32 flags addr offset))
-      (let ((_ Unit (sink_inst inst)))
-        (lower_address flags addr offset)))
-
 
 ;; Helpers for register pairs ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -109,36 +109,42 @@ block0(v0: i64, v1: i64):
 
 function %iadd_i64_mem_ext16(i64, i64) -> i64 {
 block0(v0: i64, v1: i64):
-  v2 = sload16.i64 v1
-  v3 = iadd.i64 v0, v2
+  v2 = load.i16 v1
+  v4 = sextend.i64 v2
+  v3 = iadd.i64 v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   agh %r2, 0(%r3)
+;   lgh %r3, 0(%r3)
+;   agr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   agh %r2, 0(%r3) ; trap: heap_oob
+;   lgh %r3, 0(%r3) ; trap: heap_oob
+;   agr %r2, %r3
 ;   br %r14
 
 function %iadd_i64_mem_ext32(i64, i64) -> i64 {
 block0(v0: i64, v1: i64):
-  v2 = sload32.i64 v1
-  v3 = iadd.i64 v0, v2
-  return v3
+  v2 = load.i32 v1
+  v3 = sextend.i64 v2
+  v4 = iadd.i64 v0, v3
+  return v4
 }
 
 ; VCode:
 ; block0:
-;   agf %r2, 0(%r3)
+;   l %r3, 0(%r3)
+;   agfr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   agf %r2, 0(%r3) ; trap: heap_oob
+;   l %r3, 0(%r3) ; trap: heap_oob
+;   agfr %r2, %r3
 ;   br %r14
 
 function %iadd_i32(i32, i32) -> i32 {
@@ -227,36 +233,42 @@ block0(v0: i32, v1: i64):
 
 function %iadd_i32_mem_ext16(i32, i64) -> i32 {
 block0(v0: i32, v1: i64):
-  v2 = sload16.i32 v1
-  v3 = iadd.i32 v0, v2
+  v2 = load.i16 v1
+  v4 = sextend.i32 v2
+  v3 = iadd.i32 v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   ah %r2, 0(%r3)
+;   lh %r3, 0(%r3)
+;   ar %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ah %r2, 0(%r3) ; trap: heap_oob
+;   lh %r3, 0(%r3) ; trap: heap_oob
+;   ar %r2, %r3
 ;   br %r14
 
 function %iadd_i32_memoff_ext16(i32, i64) -> i32 {
 block0(v0: i32, v1: i64):
-  v2 = sload16.i32 v1+4096
-  v3 = iadd.i32 v0, v2
+  v2 = load.i16 v1+4096
+  v4 = sextend.i32 v2
+  v3 = iadd.i32 v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   ahy %r2, 4096(%r3)
+;   lhy %r3, 4096(%r3)
+;   ar %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ahy %r2, 0x1000(%r3) ; trap: heap_oob
+;   lhy %r3, 0x1000(%r3) ; trap: heap_oob
+;   ar %r2, %r3
 ;   br %r14
 
 function %iadd_i16(i16, i16) -> i16 {
@@ -469,36 +481,42 @@ block0(v0: i64, v1: i64):
 
 function %isub_i64_mem_ext16(i64, i64) -> i64 {
 block0(v0: i64, v1: i64):
-  v2 = sload16.i64 v1
-  v3 = isub.i64 v0, v2
+  v2 = load.i16 v1
+  v4 = sextend.i64 v2
+  v3 = isub.i64 v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   sgh %r2, 0(%r3)
+;   lgh %r3, 0(%r3)
+;   sgr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   sgh %r2, 0(%r3) ; trap: heap_oob
+;   lgh %r3, 0(%r3) ; trap: heap_oob
+;   sgr %r2, %r3
 ;   br %r14
 
 function %isub_i64_mem_ext32(i64, i64) -> i64 {
 block0(v0: i64, v1: i64):
-  v2 = sload32.i64 v1
-  v3 = isub.i64 v0, v2
-  return v3
+  v2 = load.i32 v1
+  v3 = sextend.i64 v2
+  v4 = isub.i64 v0, v3
+  return v4
 }
 
 ; VCode:
 ; block0:
-;   sgf %r2, 0(%r3)
+;   l %r3, 0(%r3)
+;   sgfr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   sgf %r2, 0(%r3) ; trap: heap_oob
+;   l %r3, 0(%r3) ; trap: heap_oob
+;   sgfr %r2, %r3
 ;   br %r14
 
 function %isub_i32(i32, i32) -> i32 {
@@ -587,36 +605,42 @@ block0(v0: i32, v1: i64):
 
 function %isub_i32_mem_ext16(i32, i64) -> i32 {
 block0(v0: i32, v1: i64):
-  v2 = sload16.i32 v1
-  v3 = isub.i32 v0, v2
+  v2 = load.i16 v1
+  v4 = sextend.i32 v2
+  v3 = isub.i32 v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   sh %r2, 0(%r3)
+;   lh %r3, 0(%r3)
+;   sr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   sh %r2, 0(%r3) ; trap: heap_oob
+;   lh %r3, 0(%r3) ; trap: heap_oob
+;   sr %r2, %r3
 ;   br %r14
 
 function %isub_i32_memoff_ext16(i32, i64) -> i32 {
 block0(v0: i32, v1: i64):
-  v2 = sload16.i32 v1+4096
-  v3 = isub.i32 v0, v2
+  v2 = load.i16 v1+4096
+  v4 = sextend.i32 v2
+  v3 = isub.i32 v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   shy %r2, 4096(%r3)
+;   lhy %r3, 4096(%r3)
+;   sr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   shy %r2, 0x1000(%r3) ; trap: heap_oob
+;   lhy %r3, 0x1000(%r3) ; trap: heap_oob
+;   sr %r2, %r3
 ;   br %r14
 
 function %isub_i16(i16, i16) -> i16 {
@@ -1057,36 +1081,42 @@ block0(v0: i64, v1: i64):
 
 function %imul_i64_mem_ext16(i64, i64) -> i64 {
 block0(v0: i64, v1: i64):
-  v2 = sload16.i64 v1
-  v3 = imul.i64 v0, v2
+  v2 = load.i16 v1
+  v4 = sextend.i64 v2
+  v3 = imul.i64 v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   mgh %r2, 0(%r3)
+;   lgh %r3, 0(%r3)
+;   msgr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   mgh %r2, 0(%r3) ; trap: heap_oob
+;   lgh %r3, 0(%r3) ; trap: heap_oob
+;   msgr %r2, %r3
 ;   br %r14
 
 function %imul_i64_mem_ext32(i64, i64) -> i64 {
 block0(v0: i64, v1: i64):
-  v2 = sload32.i64 v1
-  v3 = imul.i64 v0, v2
-  return v3
+  v2 = load.i32 v1
+  v3 = sextend.i64 v2
+  v4 = imul.i64 v0, v3
+  return v4
 }
 
 ; VCode:
 ; block0:
-;   msgf %r2, 0(%r3)
+;   l %r3, 0(%r3)
+;   msgfr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   msgf %r2, 0(%r3) ; trap: heap_oob
+;   l %r3, 0(%r3) ; trap: heap_oob
+;   msgfr %r2, %r3
 ;   br %r14
 
 function %imul_i32(i32, i32) -> i32 {
@@ -1175,36 +1205,42 @@ block0(v0: i32, v1: i64):
 
 function %imul_i32_mem_ext16(i32, i64) -> i32 {
 block0(v0: i32, v1: i64):
-  v2 = sload16.i32 v1
-  v3 = imul.i32 v0, v2
+  v2 = load.i16 v1
+  v4 = sextend.i32 v2
+  v3 = imul.i32 v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   mh %r2, 0(%r3)
+;   lh %r3, 0(%r3)
+;   msr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   mh %r2, 0(%r3) ; trap: heap_oob
+;   lh %r3, 0(%r3) ; trap: heap_oob
+;   msr %r2, %r3
 ;   br %r14
 
 function %imul_i32_memoff_ext16(i32, i64) -> i32 {
 block0(v0: i32, v1: i64):
-  v2 = sload16.i32 v1+4096
-  v3 = imul.i32 v0, v2
+  v2 = load.i16 v1+4096
+  v4 = sextend.i32 v2
+  v3 = imul.i32 v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   mhy %r2, 4096(%r3)
+;   lhy %r3, 4096(%r3)
+;   msr %r2, %r3
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   mhy %r2, 0x1000(%r3) ; trap: heap_oob
+;   lhy %r3, 0x1000(%r3) ; trap: heap_oob
+;   msr %r2, %r3
 ;   br %r14
 
 function %imul_i16(i16, i16) -> i16 {
@@ -2135,4 +2171,3 @@ block0(v0: i8, v1: i8):
 ;   dlr %r2, %r5 ; trap: int_divz
 ;   lmg %r7, %r15, 0x38(%r15)
 ;   br %r14
-

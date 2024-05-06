@@ -19,98 +19,116 @@ block0(v0: i64):
 
 function %uload8_i16(i64) -> i16 {
 block0(v0: i64):
-  v1 = uload8.i16 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = uextend.i16 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrb w0, [x0]
+;   ldrb w3, [x0]
+;   uxtb w0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrb w0, [x0] ; trap: heap_oob
+;   ldrb w3, [x0] ; trap: heap_oob
+;   uxtb w0, w3
 ;   ret
 
 function %uload8_i32(i64) -> i32 {
 block0(v0: i64):
-  v1 = uload8.i32 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = uextend.i32 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrb w0, [x0]
+;   ldrb w3, [x0]
+;   uxtb w0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrb w0, [x0] ; trap: heap_oob
+;   ldrb w3, [x0] ; trap: heap_oob
+;   uxtb w0, w3
 ;   ret
 
 function %uload8_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = uload8.i64 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = uextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrb w0, [x0]
+;   ldrb w3, [x0]
+;   uxtb w0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrb w0, [x0] ; trap: heap_oob
+;   ldrb w3, [x0] ; trap: heap_oob
+;   uxtb w0, w3
 ;   ret
 
 function %sload8_i16(i64) -> i16 {
 block0(v0: i64):
-  v1 = sload8.i16 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = sextend.i16 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrsb x0, [x0]
+;   ldrb w3, [x0]
+;   sxtb w0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrsb x0, [x0] ; trap: heap_oob
+;   ldrb w3, [x0] ; trap: heap_oob
+;   sxtb w0, w3
 ;   ret
 
 function %sload8_i32(i64) -> i32 {
 block0(v0: i64):
-  v1 = sload8.i32 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = sextend.i32 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrsb x0, [x0]
+;   ldrb w3, [x0]
+;   sxtb w0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrsb x0, [x0] ; trap: heap_oob
+;   ldrb w3, [x0] ; trap: heap_oob
+;   sxtb w0, w3
 ;   ret
 
 function %sload8_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = sload8.i64 v0
-  return v1
+  v1 = load.i8 v0
+  v2 = sextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrsb x0, [x0]
+;   ldrb w3, [x0]
+;   sxtb x0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrsb x0, [x0] ; trap: heap_oob
+;   ldrb w3, [x0] ; trap: heap_oob
+;   sxtb x0, w3
 ;   ret
 
 function %load16(i64) -> i16 {
@@ -131,66 +149,78 @@ block0(v0: i64):
 
 function %uload16_i32(i64) -> i32 {
 block0(v0: i64):
-  v1 = uload16.i32 v0
-  return v1
+  v1 = load.i16 v0
+  v2 = uextend.i32 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrh w0, [x0]
+;   ldrh w3, [x0]
+;   uxth w0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrh w0, [x0] ; trap: heap_oob
+;   ldrh w3, [x0] ; trap: heap_oob
+;   uxth w0, w3
 ;   ret
 
 function %uload16_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = uload16.i64 v0
-  return v1
+  v1 = load.i16 v0
+  v2 = uextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrh w0, [x0]
+;   ldrh w3, [x0]
+;   uxth w0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrh w0, [x0] ; trap: heap_oob
+;   ldrh w3, [x0] ; trap: heap_oob
+;   uxth w0, w3
 ;   ret
 
 function %sload16_i32(i64) -> i32 {
 block0(v0: i64):
-  v1 = sload16.i32 v0
-  return v1
+  v1 = load.i16 v0
+  v2 = sextend.i32 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrsh x0, [x0]
+;   ldrh w3, [x0]
+;   sxth w0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrsh x0, [x0] ; trap: heap_oob
+;   ldrh w3, [x0] ; trap: heap_oob
+;   sxth w0, w3
 ;   ret
 
 function %sload16_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = sload16.i64 v0
-  return v1
+  v1 = load.i16 v0
+  v2 = sextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrsh x0, [x0]
+;   ldrh w3, [x0]
+;   sxth x0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrsh x0, [x0] ; trap: heap_oob
+;   ldrh w3, [x0] ; trap: heap_oob
+;   sxth x0, w3
 ;   ret
 
 function %load32(i64) -> i32 {
@@ -211,34 +241,40 @@ block0(v0: i64):
 
 function %uload32_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = uload32.i64 v0
-  return v1
+  v1 = load.i32 v0
+  v2 = uextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldr w0, [x0]
+;   ldr w3, [x0]
+;   mov w0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldr w0, [x0] ; trap: heap_oob
+;   ldr w3, [x0] ; trap: heap_oob
+;   mov w0, w3
 ;   ret
 
 function %sload32_i64(i64) -> i64 {
 block0(v0: i64):
-  v1 = sload32.i64 v0
-  return v1
+  v1 = load.i32 v0
+  v2 = sextend.i64 v1
+  return v2
 }
 
 ; VCode:
 ; block0:
-;   ldrsw x0, [x0]
+;   ldr w3, [x0]
+;   sxtw x0, w3
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ldrsw x0, [x0] ; trap: heap_oob
+;   ldr w3, [x0] ; trap: heap_oob
+;   sxtw x0, w3
 ;   ret
 
 function %load64(i64) -> i64 {

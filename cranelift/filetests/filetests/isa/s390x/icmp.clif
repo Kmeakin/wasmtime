@@ -130,21 +130,24 @@ block0(v0: i64):
 
 function %icmp_slt_i64_mem_ext16(i64, i64) -> i8 {
 block0(v0: i64, v1: i64):
-  v2 = sload16.i64 v1
-  v3 = icmp.i64 slt v0, v2
+  v2 = load.i16 v1
+  v4 = sextend.i64 v2
+  v3 = icmp.i64 slt v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   cgh %r2, 0(%r3)
+;   lgh %r3, 0(%r3)
+;   cgr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cgh %r2, 0(%r3) ; trap: heap_oob
+;   lgh %r3, 0(%r3) ; trap: heap_oob
+;   cgr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
@@ -153,42 +156,48 @@ function %icmp_slt_i64_sym_ext16(i64) -> i8 {
   gv0 = symbol colocated %sym
 block0(v0: i64):
   v1 = symbol_value.i64 gv0
-  v2 = sload16.i64 aligned v1
-  v3 = icmp.i64 slt v0, v2
+  v2 = load.i16 aligned v1
+  v4 = sextend.i64 v2
+  v3 = icmp.i64 slt v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   cghrl %r2, %sym + 0
+;   lghrl %r3, %sym + 0
+;   cgr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cghrl %r2, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   lghrl %r3, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   cgr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 
 function %icmp_slt_i64_mem_ext32(i64, i64) -> i8 {
 block0(v0: i64, v1: i64):
-  v2 = sload32.i64 v1
-  v3 = icmp.i64 slt v0, v2
-  return v3
+  v2 = load.i32 v1
+  v3 = sextend.i64 v2
+  v4 = icmp.i64 slt v0, v3
+  return v4
 }
 
 ; VCode:
 ; block0:
-;   cgf %r2, 0(%r3)
+;   l %r3, 0(%r3)
+;   cgfr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cgf %r2, 0(%r3) ; trap: heap_oob
+;   l %r3, 0(%r3) ; trap: heap_oob
+;   cgfr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
@@ -197,21 +206,24 @@ function %icmp_slt_i64_sym_ext32(i64) -> i8 {
   gv0 = symbol colocated %sym
 block0(v0: i64):
   v1 = symbol_value.i64 gv0
-  v2 = sload32.i64 aligned v1
-  v3 = icmp.i64 slt v0, v2
-  return v3
+  v2 = load.i32 aligned v1
+  v3 = sextend.i64 v2
+  v4 = icmp.i64 slt v0, v3
+  return v4
 }
 
 ; VCode:
 ; block0:
-;   cgfrl %r2, %sym + 0
+;   lrl %r3, %sym + 0
+;   cgfr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   cgfrl %r2, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   lrl %r3, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   cgfr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
@@ -345,42 +357,48 @@ block0(v0: i32):
 
 function %icmp_slt_i32_mem_ext16(i32, i64) -> i8 {
 block0(v0: i32, v1: i64):
-  v2 = sload16.i32 v1
-  v3 = icmp.i32 slt v0, v2
+  v2 = load.i16 v1
+  v4 = sextend.i32 v2
+  v3 = icmp.i32 slt v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   ch %r2, 0(%r3)
+;   lh %r3, 0(%r3)
+;   cr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   ch %r2, 0(%r3) ; trap: heap_oob
+;   lh %r3, 0(%r3) ; trap: heap_oob
+;   cr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 
 function %icmp_slt_i32_memoff_ext16(i32, i64) -> i8 {
 block0(v0: i32, v1: i64):
-  v2 = sload16.i32 v1+4096
-  v3 = icmp.i32 slt v0, v2
+  v2 = load.i16 v1+4096
+  v4 = sextend.i32 v2
+  v3 = icmp.i32 slt v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   chy %r2, 4096(%r3)
+;   lhy %r3, 4096(%r3)
+;   cr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   chy %r2, 0x1000(%r3) ; trap: heap_oob
+;   lhy %r3, 0x1000(%r3) ; trap: heap_oob
+;   cr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
@@ -389,21 +407,24 @@ function %icmp_slt_i32_sym_ext16(i32) -> i8 {
   gv0 = symbol colocated %sym
 block0(v0: i32):
   v1 = symbol_value.i64 gv0
-  v2 = sload16.i32 aligned v1
-  v3 = icmp.i32 slt v0, v2
+  v2 = load.i16 aligned v1
+  v4 = sextend.i32 v2
+  v3 = icmp.i32 slt v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   chrl %r2, %sym + 0
+;   lhrl %r3, %sym + 0
+;   cr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   chrl %r2, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   lhrl %r3, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   cr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
@@ -683,21 +704,24 @@ block0(v0: i64):
 
 function %icmp_ult_i64_mem_ext32(i64, i64) -> i8 {
 block0(v0: i64, v1: i64):
-  v2 = uload32.i64 v1
-  v3 = icmp.i64 ult v0, v2
-  return v3
+  v2 = load.i32 v1
+  v3 = uextend.i64 v2
+  v4 = icmp.i64 ult v0, v3
+  return v4
 }
 
 ; VCode:
 ; block0:
-;   clgf %r2, 0(%r3)
+;   l %r3, 0(%r3)
+;   clgfr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   clgf %r2, 0(%r3) ; trap: heap_oob
+;   l %r3, 0(%r3) ; trap: heap_oob
+;   clgfr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
@@ -706,29 +730,33 @@ function %icmp_ult_i64_sym_ext32(i64) -> i8 {
   gv0 = symbol colocated %sym
 block0(v0: i64):
   v1 = symbol_value.i64 gv0
-  v2 = uload32.i64 aligned v1
-  v3 = icmp.i64 ult v0, v2
-  return v3
+  v2 = load.i32 aligned v1
+  v3 = uextend.i64 v2
+  v4 = icmp.i64 ult v0, v3
+  return v4
 }
 
 ; VCode:
 ; block0:
-;   clgfrl %r2, %sym + 0
+;   lrl %r3, %sym + 0
+;   clgfr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   clgfrl %r2, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   lrl %r3, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   clgfr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 
 function %icmp_ult_i64_mem_ext16(i64, i64) -> i8 {
 block0(v0: i64, v1: i64):
-  v2 = uload16.i64 v1
-  v3 = icmp.i64 ult v0, v2
+  v2 = load.i16 v1
+  v4 = uextend.i64 v2
+  v3 = icmp.i64 ult v0, v4
   return v3
 }
 
@@ -752,21 +780,24 @@ function %icmp_ult_i64_sym_ext16(i64) -> i8 {
   gv0 = symbol colocated %sym
 block0(v0: i64):
   v1 = symbol_value.i64 gv0
-  v2 = uload16.i64 aligned v1
-  v3 = icmp.i64 ult v0, v2
+  v2 = load.i16 aligned v1
+  v4 = uextend.i64 v2
+  v3 = icmp.i64 ult v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   clghrl %r2, %sym + 0
+;   llghrl %r3, %sym + 0
+;   clgr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   clghrl %r2, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   llghrl %r3, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   clgr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
@@ -879,8 +910,9 @@ block0(v0: i32):
 
 function %icmp_ult_i32_mem_ext16(i32, i64) -> i8 {
 block0(v0: i32, v1: i64):
-  v2 = uload16.i32 v1
-  v3 = icmp.i32 ult v0, v2
+  v2 = load.i16 v1
+  v4 = uextend.i32 v2
+  v3 = icmp.i32 ult v0, v4
   return v3
 }
 
@@ -904,21 +936,24 @@ function %icmp_ult_i32_sym_ext16(i32) -> i8 {
   gv0 = symbol colocated %sym
 block0(v0: i32):
   v1 = symbol_value.i64 gv0
-  v2 = uload16.i32 aligned v1
-  v3 = icmp.i32 ult v0, v2
+  v2 = load.i16 aligned v1
+  v4 = uextend.i32 v2
+  v3 = icmp.i32 ult v0, v4
   return v3
 }
 
 ; VCode:
 ; block0:
-;   clhrl %r2, %sym + 0
+;   llhrl %r3, %sym + 0
+;   clr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   clhrl %r2, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   llhrl %r3, 0 ; reloc_external PCRel32Dbl %sym 2 ; trap: heap_oob
+;   clr %r2, %r3
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
@@ -1091,4 +1126,3 @@ block0(v0: i8, v1: i64):
 ;   lhi %r2, 0
 ;   lochil %r2, 1
 ;   br %r14
-
