@@ -1,0 +1,259 @@
+test compile precise-output
+target riscv64gc
+
+function %load8(i64) -> i8 {
+block0(v0: i64):
+  v1 = load.i8 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lb a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lb a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %uload8_i16(i64) -> i16 {
+block0(v0: i64):
+  v1 = uload8.i16 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lbu a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lbu a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %uload8_i32(i64) -> i32 {
+block0(v0: i64):
+  v1 = uload8.i32 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lbu a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lbu a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %uload8_i64(i64) -> i64 {
+block0(v0: i64):
+  v1 = uload8.i64 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lbu a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lbu a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %sload8_i16(i64) -> i16 {
+block0(v0: i64):
+  v1 = sload8.i16 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lb a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lb a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %sload8_i32(i64) -> i32 {
+block0(v0: i64):
+  v1 = sload8.i32 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lb a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lb a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %sload8_i64(i64) -> i64 {
+block0(v0: i64):
+  v1 = sload8.i64 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lb a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lb a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %load16(i64) -> i16 {
+block0(v0: i64):
+  v1 = load.i16 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lh a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lh a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %uload16_i32(i64) -> i32 {
+block0(v0: i64):
+  v1 = uload16.i32 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lhu a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lhu a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %uload16_i64(i64) -> i64 {
+block0(v0: i64):
+  v1 = uload16.i64 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lhu a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lhu a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %sload16_i32(i64) -> i32 {
+block0(v0: i64):
+  v1 = sload16.i32 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lh a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lh a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %sload16_i64(i64) -> i64 {
+block0(v0: i64):
+  v1 = sload16.i64 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lh a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lh a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %load32(i64) -> i32 {
+block0(v0: i64):
+  v1 = load.i32 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lw a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lw a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %uload32_i64(i64) -> i64 {
+block0(v0: i64):
+  v1 = uload32.i64 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lwu a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lwu a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %sload32_i64(i64) -> i64 {
+block0(v0: i64):
+  v1 = sload32.i64 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   lw a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   lw a0, 0(a0) ; trap: heap_oob
+;   ret
+
+function %load64(i64) -> i64 {
+block0(v0: i64):
+  v1 = load.i64 v0
+  return v1
+}
+
+; VCode:
+; block0:
+;   ld a0,0(a0)
+;   ret
+;
+; Disassembled:
+; block0: ; offset 0x0
+;   ld a0, 0(a0) ; trap: heap_oob
+;   ret
+
