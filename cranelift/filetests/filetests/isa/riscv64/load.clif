@@ -27,13 +27,13 @@ block0(v0: i64):
 ; VCode:
 ; block0:
 ;   lb a3,0(a0)
-;   andi a0,a3,255
+;   lbu a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
 ;   lb a3, 0(a0) ; trap: heap_oob
-;   andi a0, a3, 0xff
+;   lbu a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %uload8_i32(i64) -> i32 {
@@ -46,13 +46,13 @@ block0(v0: i64):
 ; VCode:
 ; block0:
 ;   lb a3,0(a0)
-;   andi a0,a3,255
+;   lbu a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
 ;   lb a3, 0(a0) ; trap: heap_oob
-;   andi a0, a3, 0xff
+;   lbu a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %uload8_i64(i64) -> i64 {
@@ -65,13 +65,13 @@ block0(v0: i64):
 ; VCode:
 ; block0:
 ;   lb a3,0(a0)
-;   andi a0,a3,255
+;   lbu a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
 ;   lb a3, 0(a0) ; trap: heap_oob
-;   andi a0, a3, 0xff
+;   lbu a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %sload8_i16(i64) -> i16 {
@@ -83,16 +83,14 @@ block0(v0: i64):
 
 ; VCode:
 ; block0:
-;   lb a4,0(a0)
-;   slli a3,a4,56
-;   srai a0,a3,56
+;   lb a3,0(a0)
+;   lb a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   lb a4, 0(a0) ; trap: heap_oob
-;   slli a3, a4, 0x38
-;   srai a0, a3, 0x38
+;   lb a3, 0(a0) ; trap: heap_oob
+;   lb a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %sload8_i32(i64) -> i32 {
@@ -104,16 +102,14 @@ block0(v0: i64):
 
 ; VCode:
 ; block0:
-;   lb a4,0(a0)
-;   slli a3,a4,56
-;   srai a0,a3,56
+;   lb a3,0(a0)
+;   lb a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   lb a4, 0(a0) ; trap: heap_oob
-;   slli a3, a4, 0x38
-;   srai a0, a3, 0x38
+;   lb a3, 0(a0) ; trap: heap_oob
+;   lb a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %sload8_i64(i64) -> i64 {
@@ -125,16 +121,14 @@ block0(v0: i64):
 
 ; VCode:
 ; block0:
-;   lb a4,0(a0)
-;   slli a3,a4,56
-;   srai a0,a3,56
+;   lb a3,0(a0)
+;   lb a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   lb a4, 0(a0) ; trap: heap_oob
-;   slli a3, a4, 0x38
-;   srai a0, a3, 0x38
+;   lb a3, 0(a0) ; trap: heap_oob
+;   lb a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %load16(i64) -> i16 {
@@ -162,16 +156,14 @@ block0(v0: i64):
 
 ; VCode:
 ; block0:
-;   lh a4,0(a0)
-;   slli a3,a4,48
-;   srli a0,a3,48
+;   lh a3,0(a0)
+;   lhu a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   lh a4, 0(a0) ; trap: heap_oob
-;   slli a3, a4, 0x30
-;   srli a0, a3, 0x30
+;   lh a3, 0(a0) ; trap: heap_oob
+;   lhu a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %uload16_i64(i64) -> i64 {
@@ -183,16 +175,14 @@ block0(v0: i64):
 
 ; VCode:
 ; block0:
-;   lh a4,0(a0)
-;   slli a3,a4,48
-;   srli a0,a3,48
+;   lh a3,0(a0)
+;   lhu a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   lh a4, 0(a0) ; trap: heap_oob
-;   slli a3, a4, 0x30
-;   srli a0, a3, 0x30
+;   lh a3, 0(a0) ; trap: heap_oob
+;   lhu a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %sload16_i32(i64) -> i32 {
@@ -204,16 +194,14 @@ block0(v0: i64):
 
 ; VCode:
 ; block0:
-;   lh a4,0(a0)
-;   slli a3,a4,48
-;   srai a0,a3,48
+;   lh a3,0(a0)
+;   lh a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   lh a4, 0(a0) ; trap: heap_oob
-;   slli a3, a4, 0x30
-;   srai a0, a3, 0x30
+;   lh a3, 0(a0) ; trap: heap_oob
+;   lh a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %sload16_i64(i64) -> i64 {
@@ -225,16 +213,14 @@ block0(v0: i64):
 
 ; VCode:
 ; block0:
-;   lh a4,0(a0)
-;   slli a3,a4,48
-;   srai a0,a3,48
+;   lh a3,0(a0)
+;   lh a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   lh a4, 0(a0) ; trap: heap_oob
-;   slli a3, a4, 0x30
-;   srai a0, a3, 0x30
+;   lh a3, 0(a0) ; trap: heap_oob
+;   lh a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %load32(i64) -> i32 {
@@ -262,16 +248,14 @@ block0(v0: i64):
 
 ; VCode:
 ; block0:
-;   lw a4,0(a0)
-;   slli a3,a4,32
-;   srli a0,a3,32
+;   lw a3,0(a0)
+;   lwu a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
-;   lw a4, 0(a0) ; trap: heap_oob
-;   slli a3, a4, 0x20
-;   srli a0, a3, 0x20
+;   lw a3, 0(a0) ; trap: heap_oob
+;   lwu a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %sload32_i64(i64) -> i64 {
@@ -284,13 +268,13 @@ block0(v0: i64):
 ; VCode:
 ; block0:
 ;   lw a3,0(a0)
-;   sext.w a0,a3
+;   lw a0,0(a0)
 ;   ret
 ;
 ; Disassembled:
 ; block0: ; offset 0x0
 ;   lw a3, 0(a0) ; trap: heap_oob
-;   sext.w a0, a3
+;   lw a0, 0(a0) ; trap: heap_oob
 ;   ret
 
 function %load64(i64) -> i64 {

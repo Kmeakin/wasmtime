@@ -2320,6 +2320,25 @@
       (aarch64_fpuload128 (amode $I8X16 address offset) flags))
 
 (rule (lower
+       (uextend (has_type $I8 (load flags address offset))))
+      (aarch64_uload8 (amode $I8 address offset) flags))
+(rule (lower
+       (sextend (has_type $I8 (load flags address offset))))
+      (aarch64_sload8 (amode $I8 address offset) flags))
+(rule (lower
+       (uextend (has_type $I16 (load flags address offset))))
+      (aarch64_uload16 (amode $I16 address offset) flags))
+(rule (lower
+       (sextend (has_type $I16 (load flags address offset))))
+      (aarch64_sload16 (amode $I16 address offset) flags))
+(rule (lower
+       (uextend (has_type $I32 (load flags address offset))))
+      (aarch64_uload32 (amode $I32 address offset) flags))
+(rule (lower
+       (sextend (has_type $I32 (load flags address offset))))
+      (aarch64_sload32 (amode $I32 address offset) flags))
+
+(rule (lower
        (sload8x8 flags address offset))
       (vec_extend (VecExtendOp.Sxtl)
                   (aarch64_fpuload64 (amode $F64 address offset) flags)
