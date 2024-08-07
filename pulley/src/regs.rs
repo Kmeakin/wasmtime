@@ -179,6 +179,70 @@ impl fmt::Display for VReg {
     }
 }
 
+/// TODO: docs
+pub trait Reg: Copy + Sized {
+    /// TODO: docs
+    unsafe fn from_u8_unchecked(it: u8) -> Self;
+
+    /// TODO: docs
+    fn to_u8(self) -> u8;
+}
+
+impl Reg for XReg {
+    unsafe fn from_u8_unchecked(it: u8) -> Self {
+        Self::unchecked_new(it)
+    }
+
+    fn to_u8(self) -> u8 {
+        self.0
+    }
+}
+
+/// TODO: docs
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct BinaryOperands<R> {
+    /// Destination register. Packed into bits 0..5
+    pub dst: R,
+    /// First source register. Packed into bits 5..10
+    pub src1: R,
+    /// Second source register. Packed into bits 10..15
+    pub src2: R,
+}
+
+impl<R: Reg> BinaryOperands<R> {
+    /// TODO: docs
+    pub fn to_bits(self) -> u16 {
+        let dst = self.dst.to_u8() as u16;
+        let src1 = self.src1.to_u8() as u16;
+        let src2 = self.src2.to_u8() as u16;
+        dst | (src1 << 5) | (src2 << 10)
+    }
+
+    /// TODO: docs
+    pub fn from_bits(bits: u16) -> Self {
+        let dst = bits & 0b0_00000_00000_11111;
+        let src1 = (bits & 0b0_00000_11111_00000) >> 5;
+        let src2 = (bits & 0b0_11111_00000_00000) >> 10;
+
+        // SAFETY: each of `dst`, `src1` and `src2` are 5 bits, so cannot be out
+        // of range.
+        unsafe {
+            let dst = R::from_u8_unchecked(dst as u8);
+            let src1 = R::from_u8_unchecked(src1 as u8);
+            let src2 = R::from_u8_unchecked(src2 as u8);
+
+            Self { dst, src1, src2 }
+        }
+    }
+}
+
+#[cfg(feature = "arbitrary")]
+impl<'a, R: Reg> arbitrary::Arbitrary<'a> for BinaryOperands<R> {
+    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
+        u.arbitrary().map(|bits| Self::from_bits(bits))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -196,6 +260,27 @@ mod tests {
     fn not_special_x_regs() {
         for i in 0..27 {
             assert!(!XReg::new(i).unwrap().is_special());
+        }
+    }
+
+    #[test]
+    fn binary_operands() {
+        let mut i = 0;
+        for src2 in 0..32 {
+            for src1 in 0..32 {
+                for dst in 0..32 {
+                    let operands = BinaryOperands {
+                        dst: XReg::new(dst).unwrap(),
+                        src1: XReg::new(src1).unwrap(),
+                        src2: XReg::new(src2).unwrap(),
+                    };
+
+                    assert_eq!(operands.to_bits(), i);
+                    assert_eq!(BinaryOperands::from_bits(i), operands);
+                    assert_eq!(BinaryOperands::from_bits(0x8000 | i), operands);
+                    i += 1;
+                }
+            }
         }
     }
 }

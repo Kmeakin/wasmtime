@@ -375,6 +375,15 @@ impl Decode for PcRelOffset {
     }
 }
 
+impl<R: Reg> Decode for BinaryOperands<R> {
+    fn decode<T>(bytecode: &mut T) -> Result<Self, T::Error>
+    where
+        T: BytecodeStream,
+    {
+        u16::decode(bytecode).map(|x| Self::from_bits(x))
+    }
+}
+
 /// A Pulley bytecode decoder.
 ///
 /// Does not materialize bytecode instructions, instead all decoding methods are

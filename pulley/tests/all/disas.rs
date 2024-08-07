@@ -38,9 +38,11 @@ fn simple() {
                 imm: -16i8,
             }),
             Op::Xadd32(Xadd32 {
-                dst: XReg::SP,
-                src1: XReg::SP,
-                src2: x27,
+                operands: BinaryOperands {
+                    dst: XReg::SP,
+                    src1: XReg::SP,
+                    src2: x27,
+                },
             }),
             Op::Store64Offset8(Store64Offset8 {
                 ptr: XReg::SP,
@@ -57,9 +59,11 @@ fn simple() {
             }),
             // Function body.
             Op::Xadd32(Xadd32 {
-                dst: x0,
-                src1: x0,
-                src2: x1,
+                operands: BinaryOperands {
+                    dst: x0,
+                    src1: x0,
+                    src2: x1,
+                },
             }),
             // Epilogue.
             Op::Xmov(Xmov {
@@ -77,25 +81,27 @@ fn simple() {
             }),
             Op::Xconst8(Xconst8 { dst: x27, imm: 16 }),
             Op::Xadd32(Xadd32 {
-                dst: XReg::SP,
-                src1: XReg::SP,
-                src2: x27,
+                operands: BinaryOperands {
+                    dst: XReg::SP,
+                    src1: XReg::SP,
+                    src2: x27,
+                },
             }),
             Op::Ret(Ret {}),
         ],
         r#"
        0: 0e 1b f0                        xconst8 sp, -16
-       3: 12 1b 1b 1b                     xadd32 sp, sp, sp
-       7: 29 1b 08 1c                     store64_offset8 sp, 8, lr
-       b: 27 1b 1d                        store64 sp, fp
-       e: 0b 1d 1b                        xmov fp, sp
-      11: 12 00 00 01                     xadd32 x0, x0, x1
-      15: 0b 1b 1d                        xmov sp, fp
-      18: 25 1c 1b 08                     load64_offset8 lr, sp, 8
-      1c: 22 1d 1b                        load64 fp, sp
-      1f: 0e 1b 10                        xconst8 sp, 16
-      22: 12 1b 1b 1b                     xadd32 sp, sp, sp
-      26: 00                              ret
+       3: 12 7b 6f                        xadd32 sp, sp, sp
+       6: 29 1b 08 1c                     store64_offset8 sp, 8, lr
+       a: 27 1b 1d                        store64 sp, fp
+       d: 0b 1d 1b                        xmov fp, sp
+      10: 12 00 04                        xadd32 x0, x0, x1
+      13: 0b 1b 1d                        xmov sp, fp
+      16: 25 1c 1b 08                     load64_offset8 lr, sp, 8
+      1a: 22 1d 1b                        load64 fp, sp
+      1d: 0e 1b 10                        xconst8 sp, 16
+      20: 12 7b 6f                        xadd32 sp, sp, sp
+      23: 00                              ret
         "#,
     );
 }
