@@ -28,19 +28,19 @@ fn assert_disas(ops: &[Op], expected: &str) {
 fn simple() {
     let x0 = XReg::new(0).unwrap();
     let x1 = XReg::new(1).unwrap();
-    let x31 = XReg::new(31).unwrap();
+    let x27 = XReg::new(27).unwrap();
 
     assert_disas(
         &[
             // Prologue.
             Op::Xconst8(Xconst8 {
-                dst: x31,
+                dst: x27,
                 imm: -16i8,
             }),
             Op::Xadd32(Xadd32 {
                 dst: XReg::SP,
                 src1: XReg::SP,
-                src2: x31,
+                src2: x27,
             }),
             Op::Store64Offset8(Store64Offset8 {
                 ptr: XReg::SP,
@@ -75,26 +75,26 @@ fn simple() {
                 dst: XReg::FP,
                 ptr: XReg::SP,
             }),
-            Op::Xconst8(Xconst8 { dst: x31, imm: 16 }),
+            Op::Xconst8(Xconst8 { dst: x27, imm: 16 }),
             Op::Xadd32(Xadd32 {
                 dst: XReg::SP,
                 src1: XReg::SP,
-                src2: x31,
+                src2: x27,
             }),
             Op::Ret(Ret {}),
         ],
         r#"
-       0: 0e 1f f0                        xconst8 x31, -16
-       3: 12 20 20 1f                     xadd32 sp, sp, x31
-       7: 29 20 08 21                     store64_offset8 sp, 8, lr
-       b: 27 20 22                        store64 sp, fp
-       e: 0b 22 20                        xmov fp, sp
+       0: 0e 1b f0                        xconst8 sp, -16
+       3: 12 1b 1b 1b                     xadd32 sp, sp, sp
+       7: 29 1b 08 1c                     store64_offset8 sp, 8, lr
+       b: 27 1b 1d                        store64 sp, fp
+       e: 0b 1d 1b                        xmov fp, sp
       11: 12 00 00 01                     xadd32 x0, x0, x1
-      15: 0b 20 22                        xmov sp, fp
-      18: 25 21 20 08                     load64_offset8 lr, sp, 8
-      1c: 22 22 20                        load64 fp, sp
-      1f: 0e 1f 10                        xconst8 x31, 16
-      22: 12 20 20 1f                     xadd32 sp, sp, x31
+      15: 0b 1b 1d                        xmov sp, fp
+      18: 25 1c 1b 08                     load64_offset8 lr, sp, 8
+      1c: 22 1d 1b                        load64 fp, sp
+      1f: 0e 1b 10                        xconst8 sp, 16
+      22: 12 1b 1b 1b                     xadd32 sp, sp, sp
       26: 00                              ret
         "#,
     );

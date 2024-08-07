@@ -62,7 +62,7 @@ macro_rules! define_registers {
 
 define_registers! {
     /// An `x` register: integers.
-    pub struct XReg = 0..37;
+    pub struct XReg = 0..32;
 
     /// An `f` register: floats.
     pub struct FReg = 0..32;
@@ -131,22 +131,22 @@ impl<'a> arbitrary::Arbitrary<'a> for AnyReg {
 
 impl XReg {
     /// The valid special register range.
-    pub const SPECIAL_RANGE: Range<u8> = 32..37;
+    pub const SPECIAL_RANGE: Range<u8> = 27..32;
 
     /// The special `sp` stack pointer register.
-    pub const SP: Self = Self(32);
+    pub const SP: Self = Self(27);
 
     /// The special `lr` link register.
-    pub const LR: Self = Self(33);
+    pub const LR: Self = Self(28);
 
     /// The special `fp` frame pointer register.
-    pub const FP: Self = Self(34);
+    pub const FP: Self = Self(29);
 
     /// The special `spilltmp0` scratch register.
-    pub const SPILL_TMP_0: Self = Self(35);
+    pub const SPILL_TMP_0: Self = Self(30);
 
     /// The special `spilltmp1` scratch register.
-    pub const SPILL_TMP_1: Self = Self(36);
+    pub const SPILL_TMP_1: Self = Self(31);
 
     /// Is this `x` register a special register?
     pub fn is_special(&self) -> bool {
@@ -194,7 +194,7 @@ mod tests {
 
     #[test]
     fn not_special_x_regs() {
-        for i in 0..32 {
+        for i in 0..27 {
             assert!(!XReg::new(i).unwrap().is_special());
         }
     }
