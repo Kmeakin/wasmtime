@@ -1,74 +1,70 @@
 //! Pulley registers.
 
-use core::{fmt, ops::Range};
+use core::fmt;
+use std::ops::Range;
 
-macro_rules! define_registers {
-    (
-        $(
-            $( #[$attr:meta] )*
-            pub struct $name:ident = $range:expr;
-        )*
-) => {
-        $(
-            $( #[ $attr ] )*
-            #[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
-            pub struct $name(u8);
-
-            impl fmt::Debug for $name {
-                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> core::fmt::Result {
-                    fmt::Display::fmt(self, f)
-                }
-            }
-
-            impl $name {
-                /// The valid register range for this register class.
-                pub const RANGE: Range<u8> = $range;
-
-                /// Construct a new register of this class.
-                #[inline]
-                pub fn new(index: u8) -> Option<Self> {
-                    if Self::RANGE.start <= index && index < Self::RANGE.end {
-                        Some(unsafe { Self::unchecked_new(index) })
-                    } else {
-                        None
-                    }
-                }
-
-                /// Construct a new register of this class without checking that
-                /// `index` is a valid register index.
-                #[inline]
-                pub unsafe fn unchecked_new(index: u8) -> Self {
-                    debug_assert!(Self::RANGE.start <= index && index < Self::RANGE.end);
-                    Self(index)
-                }
-
-                /// Get this register's index.
-                #[inline]
-                pub fn index(&self) -> usize {
-                    usize::from(self.0)
-                }
-            }
-
-            #[cfg(feature = "arbitrary")]
-            impl<'a> arbitrary::Arbitrary<'a> for $name {
-                fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
-                    let index = u.int_in_range(Self::RANGE.start..=Self::RANGE.end - 1)?;
-                    Ok(Self(index))
-                }
-            }
-        )*
-    }
+/// An `x` register: integers.
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
+#[rustfmt::skip]
+#[allow(non_camel_case_types, missing_docs)]
+pub enum XReg {
+    x0,  x1,  x2,  x3,  x4,  x5,  x6,  x7,  x8,  x9,
+    x10, x11, x12, x13, x14, x15, x16, x17, x18, x19,
+    x20, x21, x22, x23, x24, x25, x26, x27, x28, x29,
+    x30, x31
 }
 
-define_registers! {
-    /// An `x` register: integers.
-    pub struct XReg = 0..32;
+/// An `f` register: floats.
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
+#[rustfmt::skip]
+#[allow(non_camel_case_types, missing_docs)]
+pub enum FReg {
+    f0,  f1,  f2,  f3,  f4,  f5,  f6,  f7,  f8,  f9,
+    f10, f11, f12, f13, f14, f15, f16, f17, f18, f19,
+    f20, f21, f22, f23, f24, f25, f26, f27, f28, f29,
+    f30, f31
+}
 
-    /// An `f` register: floats.
-    pub struct FReg = 0..32;
+/// A `v` register: vectors.
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
+#[rustfmt::skip]
+#[allow(non_camel_case_types, missing_docs)]
+pub enum VReg {
+    v0,  v1,  v2,  v3,  v4,  v5,  v6,  v7,  v8,  v9,
+    v10, v11, v12, v13, v14, v15, v16, v17, v18, v19,
+    v20, v21, v22, v23, v24, v25, v26, v27, v28, v29,
+    v30, v31
+}
 
-    /// A `v` register: vectors.
-    pub struct VReg = 0..32;
+/// An `s` register: special machine state.
+#[repr(u8)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
+#[allow(non_camel_case_types, missing_docs)]
+pub enum SReg {
+    SP,
+    LR,
+    FP,
+    SPILL_TMP_0,
+    SPILL_TMP_1,
+}
+
+impl fmt::Debug for SReg {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::SP => write!(f, "sp"),
+            Self::LR => write!(f, "lr"),
+            Self::FP => write!(f, "fp"),
+            Self::SPILL_TMP_0 => write!(f, "spilltmp0"),
+            Self::SPILL_TMP_1 => write!(f, "spilltmp1"),
+        }
+    }
 }
 
 /// Any register, regardless of class.
@@ -77,28 +73,12 @@ define_registers! {
 /// class of register -- but this is useful for testing and things like that.
 #[allow(missing_docs)]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub enum AnyReg {
     X(XReg),
     F(FReg),
     V(VReg),
-}
-
-impl From<XReg> for AnyReg {
-    fn from(x: XReg) -> Self {
-        Self::X(x)
-    }
-}
-
-impl From<FReg> for AnyReg {
-    fn from(f: FReg) -> Self {
-        Self::F(f)
-    }
-}
-
-impl From<VReg> for AnyReg {
-    fn from(v: VReg) -> Self {
-        Self::V(v)
-    }
+    S(SReg),
 }
 
 impl fmt::Display for AnyReg {
@@ -107,6 +87,7 @@ impl fmt::Display for AnyReg {
             AnyReg::X(r) => fmt::Display::fmt(r, f),
             AnyReg::F(r) => fmt::Display::fmt(r, f),
             AnyReg::V(r) => fmt::Display::fmt(r, f),
+            AnyReg::S(r) => fmt::Display::fmt(r, f),
         }
     }
 }
@@ -117,86 +98,69 @@ impl fmt::Debug for AnyReg {
     }
 }
 
-#[cfg(feature = "arbitrary")]
-impl<'a> arbitrary::Arbitrary<'a> for AnyReg {
-    fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
-        match u.int_in_range(0..=2)? {
-            0 => Ok(AnyReg::X(u.arbitrary()?)),
-            1 => Ok(AnyReg::F(u.arbitrary()?)),
-            2 => Ok(AnyReg::V(u.arbitrary()?)),
-            _ => unreachable!(),
-        }
-    }
-}
-
-impl XReg {
-    /// The valid special register range.
-    pub const SPECIAL_RANGE: Range<u8> = 27..32;
-
-    /// The special `sp` stack pointer register.
-    pub const SP: Self = Self(27);
-
-    /// The special `lr` link register.
-    pub const LR: Self = Self(28);
-
-    /// The special `fp` frame pointer register.
-    pub const FP: Self = Self(29);
-
-    /// The special `spilltmp0` scratch register.
-    pub const SPILL_TMP_0: Self = Self(30);
-
-    /// The special `spilltmp1` scratch register.
-    pub const SPILL_TMP_1: Self = Self(31);
-
-    /// Is this `x` register a special register?
-    pub fn is_special(&self) -> bool {
-        self.0 >= Self::SPECIAL_RANGE.start
-    }
-}
-
-impl fmt::Display for XReg {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match *self {
-            Self::SP => write!(f, "sp"),
-            Self::LR => write!(f, "lr"),
-            Self::FP => write!(f, "fp"),
-            Self::SPILL_TMP_0 => write!(f, "spilltmp0"),
-            Self::SPILL_TMP_1 => write!(f, "spilltmp1"),
-            Self(x) => write!(f, "x{x}"),
-        }
-    }
-}
-
-impl fmt::Display for FReg {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "f{}", self.0)
-    }
-}
-
-impl fmt::Display for VReg {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "v{}", self.0)
-    }
-}
-
 /// TODO: docs
 pub trait Reg: Copy + Sized {
-    /// TODO: docs
-    unsafe fn from_u8_unchecked(it: u8) -> Self;
+    /// Bounds of valid underluing `u8` values.
+    const RANGE: Range<u8>;
 
-    /// TODO: docs
+    /// Convert this register from the underlying `u8`, without bounds checks.
+    unsafe fn new_unchecked(it: u8) -> Self;
+
+    /// Convert this register from the underlying `u8`, with bounds checks.
+    #[inline]
+    fn new(it: u8) -> Option<Self> {
+        if Self::RANGE.contains(&it) {
+            unsafe { Some(Self::new_unchecked(it)) }
+        } else {
+            None
+        }
+    }
+
+    /// Convert this register to the underlying `u8`.
     fn to_u8(self) -> u8;
-}
 
-impl Reg for XReg {
-    unsafe fn from_u8_unchecked(it: u8) -> Self {
-        Self::unchecked_new(it)
-    }
-
-    fn to_u8(self) -> u8 {
-        self.0
+    /// Get this register's index.
+    #[inline]
+    fn index(&self) -> usize {
+        usize::from(self.to_u8())
     }
 }
+
+macro_rules! impl_reg {
+    ($ty:ty, $any:ident, $range:expr ) => {
+        impl Reg for $ty {
+            const RANGE: Range<u8> = $range;
+
+            #[inline]
+            unsafe fn new_unchecked(it: u8) -> Self {
+                debug_assert!(Self::RANGE.contains(&it));
+                std::mem::transmute(it)
+            }
+
+            #[inline]
+            fn to_u8(self) -> u8 {
+                self as u8
+            }
+        }
+
+        impl From<$ty> for AnyReg {
+            fn from(r: $ty) -> Self {
+                Self::$any(r)
+            }
+        }
+
+        impl fmt::Display for $ty {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                fmt::Debug::fmt(self, f)
+            }
+        }
+    };
+}
+
+impl_reg!(XReg, X, 0..32);
+impl_reg!(FReg, F, 0..32);
+impl_reg!(VReg, V, 0..32);
+impl_reg!(SReg, S, 0..(Self::SPILL_TMP_1 as u8 + 1));
 
 /// TODO: docs
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -227,9 +191,9 @@ impl<R: Reg> BinaryOperands<R> {
         // SAFETY: each of `dst`, `src1` and `src2` are 5 bits, so cannot be out
         // of range.
         unsafe {
-            let dst = R::from_u8_unchecked(dst as u8);
-            let src1 = R::from_u8_unchecked(src1 as u8);
-            let src2 = R::from_u8_unchecked(src2 as u8);
+            let dst = R::new_unchecked(dst as u8);
+            let src1 = R::new_unchecked(src1 as u8);
+            let src2 = R::new_unchecked(src2 as u8);
 
             Self { dst, src1, src2 }
         }
@@ -246,22 +210,6 @@ impl<'a, R: Reg> arbitrary::Arbitrary<'a> for BinaryOperands<R> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn special_x_regs() {
-        assert!(XReg::SP.is_special());
-        assert!(XReg::LR.is_special());
-        assert!(XReg::FP.is_special());
-        assert!(XReg::SPILL_TMP_0.is_special());
-        assert!(XReg::SPILL_TMP_1.is_special());
-    }
-
-    #[test]
-    fn not_special_x_regs() {
-        for i in 0..27 {
-            assert!(!XReg::new(i).unwrap().is_special());
-        }
-    }
 
     #[test]
     fn binary_operands() {

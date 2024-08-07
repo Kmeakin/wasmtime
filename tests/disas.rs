@@ -410,13 +410,7 @@ fn assert_or_bless_output(path: &Path, wat: &str, actual: &str) -> Result<()> {
         .lines()
         .rev()
         .take_while(|l| l.starts_with(";;"))
-        .map(|l| {
-            if l.starts_with(";; ") {
-                &l[3..]
-            } else {
-                &l[2..]
-            }
-        })
+        .map(|l| l.strip_prefix(";; ").unwrap_or(&l[2..]))
         .collect();
     expected_lines.reverse();
     let expected = expected_lines.join("\n");
