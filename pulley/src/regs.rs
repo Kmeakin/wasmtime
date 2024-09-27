@@ -57,6 +57,12 @@ macro_rules! impl_reg {
                 self as u8
             }
         }
+
+        impl From<$reg_ty> for u8 {
+            fn from(r: $reg_ty) -> u8 {
+                r.to_u8()
+            }
+        }
     };
 }
 

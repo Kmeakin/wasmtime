@@ -1,6 +1,7 @@
 //! Interpretation of pulley bytecode.
 
 use crate::decode::*;
+use crate::encode::Encode;
 use crate::imms::*;
 use crate::regs::*;
 use crate::ExtendedOpcode;
@@ -635,17 +636,17 @@ impl OpVisitor for InterpreterVisitor<'_> {
     fn call(&mut self, offset: PcRelOffset) -> Self::Return {
         let return_addr = self.pc.as_ptr();
         self.state[XReg::lr].set_ptr(return_addr.as_ptr());
-        self.pc_rel_jump(offset, 5)
+        self.pc_rel_jump(offset, 1 + crate::Call::ENCODED_SIZE as isize)
     }
 
     fn jump(&mut self, offset: PcRelOffset) -> Self::Return {
-        self.pc_rel_jump(offset, 5)
+        self.pc_rel_jump(offset, 1 + crate::Jump::ENCODED_SIZE as isize)
     }
 
     fn br_if(&mut self, cond: XReg, offset: PcRelOffset) -> Self::Return {
         let cond = self.state[cond].get_u64();
         if cond != 0 {
-            self.pc_rel_jump(offset, 6)
+            self.pc_rel_jump(offset, 1 + crate::BrIf::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -654,7 +655,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
     fn br_if_not(&mut self, cond: XReg, offset: PcRelOffset) -> Self::Return {
         let cond = self.state[cond].get_u64();
         if cond == 0 {
-            self.pc_rel_jump(offset, 6)
+            self.pc_rel_jump(offset, 1 + crate::BrIfNot::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -664,7 +665,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_u32();
         let b = self.state[b].get_u32();
         if a == b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXeq32::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -674,7 +675,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_u32();
         let b = self.state[b].get_u32();
         if a != b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXneq32::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -684,7 +685,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_i32();
         let b = self.state[b].get_i32();
         if a < b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXslt32::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -694,7 +695,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_i32();
         let b = self.state[b].get_i32();
         if a <= b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXslteq32::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -704,7 +705,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_u32();
         let b = self.state[b].get_u32();
         if a < b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXult32::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -714,7 +715,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_u32();
         let b = self.state[b].get_u32();
         if a <= b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXulteq32::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -724,7 +725,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_u64();
         let b = self.state[b].get_u64();
         if a == b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXeq64::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -734,7 +735,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_u64();
         let b = self.state[b].get_u64();
         if a != b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXneq64::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -744,7 +745,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_i64();
         let b = self.state[b].get_i64();
         if a < b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXslt64::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -754,7 +755,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_i64();
         let b = self.state[b].get_i64();
         if a <= b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXslteq64::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -764,7 +765,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_u64();
         let b = self.state[b].get_u64();
         if a < b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXult64::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
@@ -774,7 +775,7 @@ impl OpVisitor for InterpreterVisitor<'_> {
         let a = self.state[a].get_u64();
         let b = self.state[b].get_u64();
         if a <= b {
-            self.pc_rel_jump(offset, 7)
+            self.pc_rel_jump(offset, 1 + crate::BrIfXulteq64::ENCODED_SIZE as isize)
         } else {
             Continuation::Continue
         }
