@@ -204,7 +204,9 @@ impl<'src> Lexer<'src> {
                 // unsigned range (0..2^128).
                 let num = match u128::from_str_radix(&s, radix) {
                     Ok(num) => num,
-                    Err(err) => return Err(self.error(start_pos, err.to_string())),
+                    Err(err) => {
+                        return Err(self.error(start_pos, format!("Invalid integer literal: {err}")))
+                    }
                 };
 
                 let num = match (neg, num) {
@@ -218,7 +220,10 @@ impl<'src> Lexer<'src> {
 
                 Ok(Some((start_pos, tok)))
             }
-            c => Err(self.error(self.pos, format!("Unexpected character '{c}'"))),
+            _ => {
+                let c = self.peek_char().unwrap();
+                Err(self.error(self.pos, format!("Unexpected character '{c}'")))
+            }
         }
     }
 
@@ -248,6 +253,10 @@ impl<'src> Lexer<'src> {
 
     fn peek_byte(&self) -> Option<u8> {
         self.src.as_bytes().get(self.pos.offset).copied()
+    }
+
+    fn peek_char(&self) -> Option<char> {
+        self.src[self.pos.offset..].chars().next()
     }
 }
 
