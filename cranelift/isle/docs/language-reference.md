@@ -1446,9 +1446,11 @@ newline). The grammar accepted by the parser is as follows:
 
 <typedecl> ::= <ident> [ "extern" ] <typevalue>
 
-<ident> ::= ( "A".."Z" | "a".."z" | "_" | "$" )
-            ( "A".."Z" | "a".."z" | "_" | "$" | "0".."9" | "." )*
-<const-ident> ::= "$" ( "A".."Z" | "a".."z" | "_" | "$" | "0".."9" | "." )*
+<ident> ::= <ident-start> <ident-cont>*
+<const-ident> ::= "$" <ident-cont>*
+
+<ident-start> ::= "a".."z" "A".."Z" | "_" | "$" | "=" | "<" | ">" | "#"
+<ident-cont> ::= <ident-start> | "0".."9" | "." | "-"
 
 <int> ::= [ "-" ] ( "0".."9" )+
         | [ "-" ] "0x" ( "0".."9" "A".."F" "a".."f" )+

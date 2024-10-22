@@ -91,16 +91,14 @@ impl<'src> Lexer<'src> {
     fn next_token(&mut self) -> Result<Option<(Pos, Token)>> {
         fn is_sym_first_char(c: u8) -> bool {
             match c {
-                b'-' | b'0'..=b'9' | b'(' | b')' | b';' => false,
-                c if c.is_ascii_whitespace() => false,
-                _ => true,
+                b'a'..=b'z' | b'A'..=b'Z' | b'_' | b'$' | b'=' | b'<' | b'>' | b'#' => true,
+                _ => false,
             }
         }
         fn is_sym_other_char(c: u8) -> bool {
             match c {
-                b'(' | b')' | b';' | b'@' => false,
-                c if c.is_ascii_whitespace() => false,
-                _ => true,
+                b'0'..=b'9' | b'.' | b'-' => true,
+                _ => is_sym_first_char(c),
             }
         }
 
@@ -303,22 +301,6 @@ mod test {
     #[test]
     fn ends_with_num() {
         assert_eq!(lex("23"), [Token::Int(23)]);
-    }
-
-    #[test]
-    fn weird_syms() {
-        assert_eq!(
-            lex("(+ [] => !! _test!;comment\n)"),
-            [
-                Token::LParen,
-                Token::Symbol("+".to_string()),
-                Token::Symbol("[]".to_string()),
-                Token::Symbol("=>".to_string()),
-                Token::Symbol("!!".to_string()),
-                Token::Symbol("_test!".to_string()),
-                Token::RParen,
-            ]
-        );
     }
 
     #[test]
