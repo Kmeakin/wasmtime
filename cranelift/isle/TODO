@@ -2,10 +2,6 @@
 
 - Clean up and factor the codegen properly.
 
-- Get rid of the expression syntax `<EXPR` in patterns; do a type-dependent
-  parse instead where we know the polarity of pattern-term args and parse
-  in-args as exprs.
-
 - Look into whether optimizations are possible:
   - More in-depth fallibility analysis (avoid failure edges where possible)
 
