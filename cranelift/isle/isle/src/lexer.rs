@@ -14,7 +14,7 @@ type Result<T> = std::result::Result<T, Error>;
 pub struct Lexer<'src> {
     src: &'src str,
     pos: Pos,
-    lookahead: Option<(Pos, Token)>,
+    lookahead: Option<(Pos, Token<'src>)>,
 }
 
 /// A source position.
@@ -46,14 +46,14 @@ impl Pos {
 }
 
 /// A token of ISLE source.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum Token {
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum Token<'src> {
     /// Left paren.
     LParen,
     /// Right paren.
     RParen,
     /// A symbol, e.g. `Foo`.
-    Symbol(String),
+    Symbol(&'src str),
     /// An integer.
     Int(i128),
     /// `@`
@@ -88,7 +88,7 @@ impl<'src> Lexer<'src> {
         }
     }
 
-    fn next_token(&mut self) -> Result<Option<(Pos, Token)>> {
+    fn next_token(&mut self) -> Result<Option<(Pos, Token<'src>)>> {
         fn is_sym_first_char(c: u8) -> bool {
             match c {
                 b'-' | b'0'..=b'9' | b'(' | b')' | b';' => false,
@@ -149,7 +149,7 @@ impl<'src> Lexer<'src> {
                 let end = self.pos.offset;
                 let s = &self.src[start..end];
                 debug_assert!(!s.is_empty());
-                Ok(Some((start_pos, Token::Symbol(s.to_string()))))
+                Ok(Some((start_pos, Token::Symbol(s))))
             }
             c @ (b'0'..=b'9' | b'-') => {
                 let start_pos = self.pos();
@@ -225,7 +225,7 @@ impl<'src> Lexer<'src> {
     }
 
     /// Get the next token from this lexer's token stream, if any.
-    pub fn next(&mut self) -> Result<Option<(Pos, Token)>> {
+    pub fn next(&mut self) -> Result<Option<(Pos, Token<'src>)>> {
         let tok = self.lookahead.take();
         self.reload()?;
         Ok(tok)
@@ -239,7 +239,7 @@ impl<'src> Lexer<'src> {
     }
 
     /// Peek ahead at the next token.
-    pub fn peek(&self) -> Option<&(Pos, Token)> {
+    pub fn peek(&self) -> Option<&(Pos, Token<'src>)> {
         self.lookahead.as_ref()
     }
 
@@ -253,7 +253,7 @@ impl<'src> Lexer<'src> {
     }
 }
 
-impl Token {
+impl<'src> Token<'src> {
     /// Is this an `Int` token?
     pub fn is_int(&self) -> bool {
         matches!(self, Token::Int(_))
@@ -285,9 +285,9 @@ mod test {
             lex(";; comment\n; another\r\n   \t(one two three 23 -568  )\n"),
             [
                 Token::LParen,
-                Token::Symbol("one".to_string()),
-                Token::Symbol("two".to_string()),
-                Token::Symbol("three".to_string()),
+                Token::Symbol("one"),
+                Token::Symbol("two"),
+                Token::Symbol("three"),
                 Token::Int(23),
                 Token::Int(-568),
                 Token::RParen
@@ -297,7 +297,7 @@ mod test {
 
     #[test]
     fn ends_with_sym() {
-        assert_eq!(lex("asdf"), [Token::Symbol("asdf".to_string())]);
+        assert_eq!(lex("asdf"), [Token::Symbol("asdf")]);
     }
 
     #[test]
@@ -311,11 +311,11 @@ mod test {
             lex("(+ [] => !! _test!;comment\n)"),
             [
                 Token::LParen,
-                Token::Symbol("+".to_string()),
-                Token::Symbol("[]".to_string()),
-                Token::Symbol("=>".to_string()),
-                Token::Symbol("!!".to_string()),
-                Token::Symbol("_test!".to_string()),
+                Token::Symbol("+"),
+                Token::Symbol("[]"),
+                Token::Symbol("=>"),
+                Token::Symbol("!!"),
+                Token::Symbol("_test!"),
                 Token::RParen,
             ]
         );

@@ -16,8 +16,8 @@ pub fn parse(lexer: Lexer) -> Result<Vec<Def>> {
 ///
 /// Takes in a lexer and creates an AST.
 #[derive(Clone, Debug)]
-struct Parser<'a> {
-    lexer: Lexer<'a>,
+struct Parser<'src> {
+    lexer: Lexer<'src>,
 }
 
 /// Used during parsing a `(rule ...)` to encapsulate some form that
@@ -28,9 +28,9 @@ enum IfLetOrExpr {
     Expr(Expr),
 }
 
-impl<'a> Parser<'a> {
+impl<'src> Parser<'src> {
     /// Construct a new parser from the given lexer.
-    pub fn new(lexer: Lexer<'a>) -> Parser<'a> {
+    pub fn new(lexer: Lexer<'src>) -> Parser<'src> {
         Parser { lexer }
     }
 
@@ -41,7 +41,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn expect<F: Fn(&Token) -> bool>(&mut self, f: F) -> Result<Token> {
+    fn expect<F: Fn(&Token<'src>) -> bool>(&mut self, f: F) -> Result<Token<'src>> {
         if let Some(&(pos, ref peek)) = self.lexer.peek() {
             if !f(peek) {
                 return Err(self.error(pos, format!("Unexpected token {peek:?}")));
@@ -52,7 +52,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn eat<F: Fn(&Token) -> bool>(&mut self, f: F) -> Result<Option<Token>> {
+    fn eat<F: Fn(&Token<'src>) -> bool>(&mut self, f: F) -> Result<Option<Token<'src>>> {
         if let Some(&(_pos, ref peek)) = self.lexer.peek() {
             if !f(peek) {
                 return Ok(None);
@@ -63,7 +63,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn is<F: Fn(&Token) -> bool>(&self, f: F) -> bool {
+    fn is<F: Fn(&Token<'src>) -> bool>(&self, f: F) -> bool {
         if let Some((_, peek)) = self.lexer.peek() {
             f(peek)
         } else {
@@ -108,10 +108,7 @@ impl<'a> Parser<'a> {
     }
 
     fn is_spec_bool(&self) -> bool {
-        self.is(|tok| match tok {
-            Token::Symbol(tok_s) if tok_s == "$true" || tok_s == "$false" => true,
-            _ => false,
-        })
+        self.is(|tok| matches!(tok, Token::Symbol("$true" | "$false")))
     }
 
     fn expect_lparen(&mut self) -> Result<()> {
@@ -124,7 +121,7 @@ impl<'a> Parser<'a> {
         self.expect(|tok| *tok == Token::At).map(|_| ())
     }
 
-    fn expect_symbol(&mut self) -> Result<String> {
+    fn expect_symbol(&mut self) -> Result<&'src str> {
         match self.expect(Token::is_sym)? {
             Token::Symbol(s) => Ok(s),
             _ => unreachable!(),
@@ -133,7 +130,7 @@ impl<'a> Parser<'a> {
 
     fn eat_sym_str(&mut self, s: &str) -> Result<bool> {
         self.eat(|tok| match tok {
-            Token::Symbol(ref tok_s) if tok_s == s => true,
+            Token::Symbol(ref tok_s) if *tok_s == s => true,
             _ => false,
         })
         .map(|token| token.is_some())
@@ -424,7 +421,7 @@ impl<'a> Parser<'a> {
             }
             if self.is_sym() && !self.is_spec_bit_vector() {
                 let sym = self.expect_symbol()?;
-                if let Ok(op) = self.parse_spec_op(sym.as_str()) {
+                if let Ok(op) = self.parse_spec_op(sym) {
                     let mut args: Vec<SpecExpr> = vec![];
                     while !self.is_rparen() {
                         args.push(self.parse_spec_expr()?);
@@ -531,7 +528,7 @@ impl<'a> Parser<'a> {
     fn parse_spec_bool(&mut self) -> Result<i8> {
         let pos = self.pos();
         let s = self.expect_symbol()?;
-        match s.as_str() {
+        match s {
             "$true" => Ok(1),
             "$false" => Ok(0),
             x => Err(self.error(pos, format!("Not a valid spec boolean: {x}"))),
