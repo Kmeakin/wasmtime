@@ -217,7 +217,7 @@ pub struct Term {
 }
 
 /// Flags from a term's declaration with `(decl ...)`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct TermFlags {
     /// Whether the term is marked as `pure`.
     pub pure: bool,
@@ -1715,7 +1715,7 @@ impl TermEnv {
                     let termdata = &self.terms[root_term.index()];
 
                     let flags = match &termdata.kind {
-                        TermKind::Decl { flags, .. } => flags,
+                        TermKind::Decl { flags, .. } => *flags,
                         _ => {
                             tyenv.report_error(
                                 pos,
@@ -1742,7 +1742,6 @@ impl TermEnv {
                         Some(termdata.ret_ty),
                         &mut bindings,
                         flags,
-                        /* on_lhs */ false,
                     ));
 
                     bindings.exit_scope();
@@ -2099,8 +2098,7 @@ impl TermEnv {
         expr: &ast::Expr,
         ty: Option<TypeId>,
         bindings: &mut Bindings,
-        root_flags: &TermFlags,
-        on_lhs: bool,
+        root_flags: TermFlags,
     ) -> Option<Expr> {
         log!("translate_expr: {:?}", expr);
         match expr {
@@ -2149,7 +2147,6 @@ impl TermEnv {
                             ty,
                             bindings,
                             root_flags,
-                            on_lhs,
                         );
                     }
 
@@ -2168,7 +2165,7 @@ impl TermEnv {
                 if let TermKind::Decl { flags, .. } = &termdata.kind {
                     // On the left-hand side of a rule or in a pure term, only pure terms may be
                     // used.
-                    let pure_required = on_lhs || root_flags.pure;
+                    let pure_required = root_flags.pure;
                     if pure_required && !flags.pure {
                         tyenv.report_error(
                             pos,
@@ -2192,7 +2189,7 @@ impl TermEnv {
 
                     // Partial terms may always be used on the left-hand side of a rule. On the
                     // right-hand side they may only be used inside other partial terms.
-                    let partial_allowed = on_lhs || root_flags.partial;
+                    let partial_allowed = root_flags.partial;
                     if !partial_allowed && flags.partial {
                         tyenv.report_error(
                             pos,
@@ -2217,7 +2214,7 @@ impl TermEnv {
                     .iter()
                     .zip(termdata.arg_tys.iter())
                     .filter_map(|(arg, &arg_ty)| {
-                        self.translate_expr(tyenv, arg, Some(arg_ty), bindings, root_flags, on_lhs)
+                        self.translate_expr(tyenv, arg, Some(arg_ty), bindings, root_flags)
                     })
                     .collect();
 
@@ -2246,7 +2243,6 @@ impl TermEnv {
                             ty,
                             bindings,
                             root_flags,
-                            on_lhs,
                         );
                     }
 
@@ -2340,7 +2336,6 @@ impl TermEnv {
                         Some(tid),
                         bindings,
                         root_flags,
-                        on_lhs,
                     )));
 
                     // Bind the var with the given type.
@@ -2349,8 +2344,7 @@ impl TermEnv {
                 }
 
                 // Evaluate the body, expecting the type of the overall let-expr.
-                let body =
-                    Box::new(self.translate_expr(tyenv, body, ty, bindings, root_flags, on_lhs)?);
+                let body = Box::new(self.translate_expr(tyenv, body, ty, bindings, root_flags)?);
                 let body_ty = body.ty();
 
                 // Pop the bindings.
@@ -2370,7 +2364,7 @@ impl TermEnv {
         tyenv: &mut TypeEnv,
         iflet: &ast::IfLet,
         bindings: &mut Bindings,
-        root_flags: &TermFlags,
+        root_flags: TermFlags,
     ) -> Option<IfLet> {
         // Translate the expr first. The `if-let` and `if` forms are part of the left-hand side of
         // the rule.
@@ -2379,8 +2373,11 @@ impl TermEnv {
             &iflet.expr,
             None,
             bindings,
-            root_flags,
-            /* on_lhs */ true,
+            TermFlags {
+                pure: true,
+                partial: true,
+                ..root_flags
+            },
         )?;
         let lhs = self.translate_pattern(tyenv, &iflet.pattern, rhs.ty(), bindings)?;
 
