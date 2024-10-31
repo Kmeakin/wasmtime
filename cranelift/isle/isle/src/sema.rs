@@ -185,7 +185,7 @@ pub struct TermEnv {
     /// This is indexed by `RuleId`.
     pub rules: Vec<Rule>,
 
-    /// Map from (inner_ty, outer_ty) pairs to term IDs, giving the
+    /// Map from (from_ty, to_ty) pairs to term IDs, giving the
     /// defined implicit type-converter terms we can try to use to fit
     /// types together.
     pub converters: StableMap<(TypeId, TypeId), TermId>,
@@ -2068,15 +2068,17 @@ impl TermEnv {
             .collect()
     }
 
+    /// Get the implicit conversion term (declared with `(convert ...)`) for
+    /// converting expressions of type `from` to type `to`.
     fn maybe_implicit_convert_expr(
         &self,
         tyenv: &mut TypeEnv,
         expr: &ast::Expr,
-        inner_ty: TypeId,
-        outer_ty: TypeId,
+        from: TypeId,
+        to: TypeId,
     ) -> Option<ast::Expr> {
         // Is there a converter for this type mismatch?
-        if let Some(converter_term) = self.converters.get(&(inner_ty, outer_ty)) {
+        if let Some(converter_term) = self.converters.get(&(from, to)) {
             if self.terms[converter_term.index()].has_constructor() {
                 let converter_ident = ast::Ident(
                     tyenv.syms[self.terms[converter_term.index()].name.index()].clone(),
@@ -2096,12 +2098,12 @@ impl TermEnv {
         &self,
         tyenv: &mut TypeEnv,
         expr: &ast::Expr,
-        ty: Option<TypeId>,
+        expected_ty: Option<TypeId>,
         bindings: &mut Bindings,
         root_flags: TermFlags,
     ) -> Option<Expr> {
         log!("translate_expr: {:?}", expr);
-        match expr {
+        let translated_expr = match expr {
             &ast::Expr::Term {
                 ref sym,
                 ref args,
@@ -2130,38 +2132,8 @@ impl TermEnv {
                 };
                 let termdata = &self.terms[tid.index()];
 
-                // Get the return type and arg types. Verify the
-                // expected type of this pattern, if any, against the
-                // return type of the term, and determine whether we
-                // are doing an implicit conversion. Report an error
-                // if types don't match and no conversion is possible.
+                // Get the return type and arg types.
                 let ret_ty = termdata.ret_ty;
-                let ty = if ty.is_some() && ret_ty != ty.unwrap() {
-                    // Is there a converter for this type mismatch?
-                    if let Some(expanded_expr) =
-                        self.maybe_implicit_convert_expr(tyenv, expr, ret_ty, ty.unwrap())
-                    {
-                        return self.translate_expr(
-                            tyenv,
-                            &expanded_expr,
-                            ty,
-                            bindings,
-                            root_flags,
-                        );
-                    }
-
-                    tyenv.report_error(
-                        pos,
-                        format!("Mismatched types: expression expects type '{}' but term has return type '{}'",
-                                tyenv.types[ty.unwrap().index()].name(tyenv),
-                                tyenv.types[ret_ty.index()].name(tyenv)));
-
-                    // Keep going, to discover more errors.
-                    ret_ty
-                } else {
-                    ret_ty
-                };
-
                 if let TermKind::Decl { flags, .. } = &termdata.kind {
                     // On the left-hand side of a rule or in a pure term, only pure terms may be
                     // used.
@@ -2218,7 +2190,7 @@ impl TermEnv {
                     })
                     .collect();
 
-                Some(Expr::Term(ty, tid, subexprs))
+                Expr::Term(ret_ty, tid, subexprs)
             }
             &ast::Expr::Var { ref name, pos } => {
                 let sym = tyenv.intern_mut(name);
@@ -2231,55 +2203,28 @@ impl TermEnv {
                     Some(bv) => bv,
                 };
 
-                // Verify type. Maybe do an implicit conversion.
-                if ty.is_some() && bv.ty != ty.unwrap() {
-                    // Is there a converter for this type mismatch?
-                    if let Some(expanded_expr) =
-                        self.maybe_implicit_convert_expr(tyenv, expr, bv.ty, ty.unwrap())
-                    {
-                        return self.translate_expr(
-                            tyenv,
-                            &expanded_expr,
-                            ty,
-                            bindings,
-                            root_flags,
-                        );
-                    }
-
-                    tyenv.report_error(
-                        pos,
-                        format!(
-                            "Variable '{}' has type {} but we need {} in context",
-                            name.0,
-                            tyenv.types[bv.ty.index()].name(tyenv),
-                            tyenv.types[ty.unwrap().index()].name(tyenv)
-                        ),
-                    );
-                }
-
-                Some(Expr::Var(bv.ty, bv.id))
+                Expr::Var(bv.ty, bv.id)
             }
             &ast::Expr::ConstInt { val, pos } => {
-                if ty.is_none() {
+                let Some(expected_ty) = expected_ty else {
                     tyenv.report_error(
                         pos,
                         "integer literal in a context that needs an explicit type".to_string(),
                     );
                     return None;
-                }
-                let ty = ty.unwrap();
+                };
 
-                if !tyenv.types[ty.index()].is_prim() {
+                if !tyenv.types[expected_ty.index()].is_prim() {
                     tyenv.report_error(
                         pos,
                         format!(
                             "expected non-primitive type {}, but found integer literal '{}'",
-                            tyenv.types[ty.index()].name(tyenv),
+                            tyenv.types[expected_ty.index()].name(tyenv),
                             val,
                         ),
                     );
                 }
-                Some(Expr::ConstInt(ty, val))
+                Expr::ConstInt(expected_ty, val)
             }
             &ast::Expr::ConstPrim { ref val, pos } => {
                 let val = tyenv.intern_mut(val);
@@ -2290,19 +2235,7 @@ impl TermEnv {
                         return None;
                     }
                 };
-                if ty.is_some() && const_ty != ty.unwrap() {
-                    tyenv.report_error(
-                        pos,
-                        format!(
-                            "Constant '{}' has wrong type: expected {}, but is actually {}",
-                            tyenv.syms[val.index()],
-                            tyenv.types[ty.unwrap().index()].name(tyenv),
-                            tyenv.types[const_ty.index()].name(tyenv)
-                        ),
-                    );
-                    return None;
-                }
-                Some(Expr::ConstPrim(const_ty, val))
+                Expr::ConstPrim(const_ty, val)
             }
             &ast::Expr::Let {
                 ref defs,
@@ -2344,19 +2277,53 @@ impl TermEnv {
                 }
 
                 // Evaluate the body, expecting the type of the overall let-expr.
-                let body = Box::new(self.translate_expr(tyenv, body, ty, bindings, root_flags)?);
+                let body = Box::new(self.translate_expr(
+                    tyenv,
+                    body,
+                    expected_ty,
+                    bindings,
+                    root_flags,
+                )?);
                 let body_ty = body.ty();
 
                 // Pop the bindings.
                 bindings.exit_scope();
 
-                Some(Expr::Let {
+                Expr::Let {
                     ty: body_ty,
                     bindings: let_defs,
                     body,
-                })
+                }
+            }
+        };
+        if let Some(expected_ty) = expected_ty {
+            let translated_ty = translated_expr.ty();
+            if translated_ty != expected_ty {
+                // Is there a converter for this type mismatch?
+                match self.maybe_implicit_convert_expr(tyenv, expr, translated_ty, expected_ty) {
+                    Some(expanded_expr) => {
+                        return self.translate_expr(
+                            tyenv,
+                            &expanded_expr,
+                            Some(expected_ty),
+                            bindings,
+                            root_flags,
+                        );
+                    }
+                    None => {
+                        tyenv.report_error(
+                            expr.pos(),
+                            format!(
+                                "Mismatched types: expected '{}' but expression is '{}'",
+                                tyenv.types[expected_ty.index()].name(tyenv),
+                                tyenv.types[translated_ty.index()].name(tyenv)
+                            ),
+                        );
+                    }
+                }
             }
         }
+        Some(translated_expr)
     }
 
     fn translate_iflet(
